@@ -1,0 +1,35 @@
+$dropdown-link-active-bg: rgb(197, 181, 242);
+
+
+$nav-link-color: #bbc1c7;
+$nav-tabs-link-active-color: #9232d1;
+$nav-link-hover-color: rgb(197, 181, 242);
+
+.nav-link.active {
+    color: $nav-tabs-link-active-color;
+}
+
+.mainNav {
+    margin-bottom: 1rem;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+}
+
+.navElement {
+    -webkit-app-region: no-drag;
+}
+
+.mainSpacer {
+    margin-top: 4.5rem;
+}
+
+.offcanvasSpacer{
+    height: 0.5rem;
+}
+
+.navActionButton {
+    margin-top: .25rem;
+    margin-bottom: .25rem;
+    margin-left: 0;
+    margin-right: .5rem;
+}

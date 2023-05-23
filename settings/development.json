@@ -1,0 +1,32 @@
+{
+    "public": {},
+    "pollInterval": 60000,
+    "jobInterval": 5000,
+    "pageWait": 1000,
+    "monitoredChannels": [
+        {
+            "channelName": "NASA",
+            "mustHaves": [
+                "Live"
+            ],
+            "inclusions": [
+                "Official Stream",
+                "Artemis"
+            ],
+            "exclusions": [
+                "ask",
+                "anniversary"
+            ]
+        },
+        {
+            "channelName": "AutoalexCars",
+            "mustHaves": [
+                "challenge"
+            ],
+            "inclusions": [
+            ],
+            "exclusions": [
+            ]
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "public": {
+        "electrified": true
+    },
+    "pollInterval": 60000,
+    "jobInterval": 5000,
+    "pageWait": 1000,
+    "monitoredChannels": [
+        {
+            "channelName": "keepupfootball",
+            "mustHaves": [
+                "Liberty"
+            ],
+            "inclusions": [
+                "Melbourne Victory",
+                "Western United",
+                "Western Sydney Wanderers",
+                "Melbourne City"
+            ],
+            "exclusions": [
+                "Goal",
+                "Highlights",
+                "Mini Match",
+                "shot",
+                "Preview"
+            ]
+        }
+    ]
+}

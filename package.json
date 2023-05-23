@@ -1,0 +1,58 @@
+{
+  "name": "louisville-on-loan",
+  "version": "0.0.9",
+  "author": "Dallas Howard <dallas@galacticwidgets.com>",
+  "description": "Keep Up with Racing Louisville players on loan",
+  "private": false,
+  "scripts": {
+    "start": "meteor run",
+    "test": "./tests/test.sh",
+    "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
+    "visualize": "meteor --production --extra-packages bundle-visualizer",
+    "desktop": "meteor-desktop"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.17.9",
+    "@baggie/string": "^1.5.0",
+    "@popperjs/core": "^2.11.6",
+    "bootstrap": "^5.2.3",
+    "bootstrap-icons": "^1.10.3",
+    "ffmpeg-static": "^4.4.1",
+    "luxon": "^3.2.1",
+    "meteor-electrify-client": "^2.0.0",
+    "meteor-node-stubs": "^1.2.5",
+    "mongodb-prebuilt": "^6.5.0",
+    "mute": "^2.0.6",
+    "node-abort-controller": "^3.0.1",
+    "prop-types": "^15.8.1",
+    "puppeteer": "^20.1.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "to-camel-case": "^1.0.0",
+    "underscore": "^1.13.6",
+    "ytdl-core": "^4.9.1"
+  },
+  "meteor": {
+    "mainModule": {
+      "client": "client/main.jsx",
+      "server": "server/main.js"
+    },
+    "testModule": "tests/main.js"
+  },
+  "electronPackager": {
+    "icon": {
+      "darwin": "../public/icons/Racing_Louisville_FC_logo.svg-1024x1024.icns",
+      "linux": "../public/icons/Racing_Louisville_FC_logo.svg-1024x1024.png",
+      "win32": "../public/icons/Racing_Louisville_FC_logo.svg-1024x1024.ico"
+    },
+    "osx-sign": {
+      "identity": null,
+      "entitlements": null,
+      "entitlements-inherit": null
+    },
+    "osx-notarize": {
+      "appleId": null,
+      "appleIdPassword": null
+    }
+  }
+}

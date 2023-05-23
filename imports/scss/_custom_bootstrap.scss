@@ -1,0 +1,14 @@
+$primary: #C5B5F2;
+$secondary: #bbc1c7;
+$active: #9232d1;
+$theme-colors: (
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": #28a745,
+    "info": #17a2b8,
+    "warning": #ffc107,
+    "danger": #dc3545,
+    "light": #f8f9fa,
+    "dark": #343a40,
+    "active": $active
+);

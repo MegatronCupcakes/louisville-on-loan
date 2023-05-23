@@ -1,0 +1,11 @@
+.nvmrc
+.DS_Store
+.dist
+node_modules/
+dist/darwin/
+dist/docker/
+dist/linux/
+dist/win32/
+build_logs/
+env/
+.meteor/local
