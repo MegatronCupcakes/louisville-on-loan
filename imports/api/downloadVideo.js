@@ -17,7 +17,6 @@ const _abortListener = (_controller, jobId) => {
     console.log(`process exiting; aborting download (${jobId})!`);
     _controller.abort();
 };
-const _abortAfter = 10 * 60 * 1000; // abort downloads if no segments have been downloaded in the last 10 minutes.
 const pendingLiveMessage = 'live event will begin in ';
 
 const downloadVideo = (job) => {

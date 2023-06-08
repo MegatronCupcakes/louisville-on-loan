@@ -44,8 +44,8 @@ cat > ${PROJECTDIR}/.electrify/electrify.json <<EOM
 {"preserve_db": true}
 EOM
 echo ${INFO} Electrifying.....
-electrify package --settings ./settings/desktop.json --temp ${TEMPDIR}/electrify_temp/ --output ${TEMPDIR}/package/ #>> ${LOGFILE} 2>&1
-#npx @megatroncupcakes/meteor-electrify package --settings ./settings/desktop.json --temp ${TEMPDIR}/electrify_temp/ --output ${TEMPDIR}/package/ >> ${LOGFILE} 2>&1
+electrify package --settings ./settings/desktop.json --temp ${TEMPDIR}/electrify_temp/ --output ${TEMPDIR}/package/ >> ${LOGFILE} 2>&1
+
 # ------------------------------
 # Linux: Create AppImage
 # ------------------------------
