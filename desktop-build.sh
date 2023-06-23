@@ -6,7 +6,12 @@ PROJECTDESCRIPTION=`node -e "console.log(require('./package.json').description);
 
 # eventually merge darwin and linux builds.
 PLATFORM=`echo \`uname -s\` | awk '{print tolower($0)}'`
-echo Detected ${PLATFORM} platform.... adjusting build accordingly...
+SYSARCH=`uname -m`
+PRETTY_ARCH=${SYSARCH}
+if [ "${PRETTY_ARCH}" = "x86_64" ]; then
+PRETTY_ARCH="x64"
+fi
+echo Detected ${PLATFORM} ${SYSARCH} platform.... adjusting build accordingly...
 
 # Log to stdout
 INFO="[${PROJECTNAME}-electrifying]"
@@ -45,13 +50,13 @@ cat > ${PROJECTDIR}/.electrify/electrify.json <<EOM
 EOM
 echo ${INFO} Electrifying.....
 electrify package --settings ./settings/desktop.json --temp ${TEMPDIR}/electrify_temp/ --output ${TEMPDIR}/package/ >> ${LOGFILE} 2>&1
+node ./util/electrify_puppeteer.js ${TEMPDIR}/package/${PROJECTNAME}-${PLATFORM}-${PRETTY_ARCH}
 
 # ------------------------------
 # Linux: Create AppImage
 # ------------------------------
 if [ "${PLATFORM}" = "linux" ]; then
 echo ${INFO} Creating AppImage
-SYSARCH=`uname -m`
 mkdir -p ${TEMPDIR}/${PROJECTNAME}.AppDir/usr/bin/resources/app/db \
     ${TEMPDIR}/${PROJECTNAME}.AppDir/usr/lib
 cp -R ${TEMPDIR}/package/*/. ${TEMPDIR}/${PROJECTNAME}.AppDir/usr/bin

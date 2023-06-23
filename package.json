@@ -25,7 +25,7 @@
     "mute": "^2.0.6",
     "node-abort-controller": "^3.0.1",
     "prop-types": "^15.8.1",
-    "puppeteer": "^20.1.2",
+    "puppeteer": "^19.11.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "to-camel-case": "^1.0.0",
@@ -54,5 +54,8 @@
       "appleId": null,
       "appleIdPassword": null
     }
+  },
+  "electrifyDependencies": {
+    
   }
 }

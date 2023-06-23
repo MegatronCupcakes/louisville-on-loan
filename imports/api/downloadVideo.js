@@ -75,7 +75,10 @@ const downloadVideo = (job) => {
                                 .then(fn)
                                 .catch((error) => {
                                     JobCollection.update({_id: job._id}, {$push: {'downloadProgress.error': error.message}});
-                                    if(error.message.toLowerCase().includes(pendingLiveMessage)){
+                                    if(
+                                        (error.message && error.message.toLowerCase().includes(pendingLiveMessage))
+                                        || (_.isString(error) && error.toLowerCase().includes(pendingLiveMessage))
+                                    ){
                                         // calculate new start time and update job, then resolve.
                                         let startsIn = _.last(error.message.split(pendingLiveMessage));
                                         if(startsIn.charAt(startsIn.length -1) == ".") startsIn = startsIn.slice(0,-1);

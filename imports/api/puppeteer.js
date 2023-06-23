@@ -1,11 +1,20 @@
+import { Meteor } from 'meteor/meteor';
 import puppeteer from 'puppeteer';
+import path from 'node:path';
 
-const browser = await puppeteer.launch({
-    headless: "new",    
-    args:['--no-sandbox'],
+let browserOptions = {
+    headless: "new",
+    args: ['--no-sandbox'],
     protocolTimeout: 60 * 1000
-}).catch(error => {throw error});
+};
 
+if (Meteor.settings.public.electrified && process.cwd().includes('.mount')) {
+    // update the puppeteer executable path for AppImages; binaries are copied to puppeteerBin on build
+    const puppeteerBinPath = path.resolve(process.cwd(), '..', '..', '..', '..', '..', 'puppeteerBin', 'chrome');    
+    browserOptions.executablePath = puppeteerBinPath;
+}
+
+const browser = await puppeteer.launch(browserOptions).catch(error => { throw error });
 const killPuppeteer = (_browser) => {
     _browser.close();
 };
