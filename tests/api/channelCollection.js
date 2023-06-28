@@ -84,6 +84,9 @@ const _verifyChannel = (channel, verifyChannel) => {
             case "channelIcon":
                 assert(_.isString(verifyChannel.channelIcon));
                 break;
+            case "channelId":
+                assert(_.isString(verifyChannel.channelId));
+                break;
             case "deleted":
                 assert(!verifyChannel.deleted);
                 break;
@@ -119,6 +122,9 @@ const _verifyChannel = (channel, verifyChannel) => {
                 break;
             case "_id":
                 assert(_.isString(channel._id));
+                break;
+            case "channelId":
+                assert(_.isString(verifyChannel.channelId));
                 break;
             default:
                 if(channel[key] !== verifyChannel[key]) console.log(`channel[key]: "${channel[key]}" verifyChannel[key]: "${verifyChannel[key]}" match? ${channel[key] == verifyChannel[key]}`);

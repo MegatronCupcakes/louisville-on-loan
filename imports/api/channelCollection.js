@@ -1,8 +1,10 @@
 import {Meteor} from 'meteor/meteor';
 import {Mongo} from 'meteor/mongo';
 import {check, Match} from 'meteor/check';
+
 import {logError} from '/imports/api/errorCollection';
 import MeteorCall from '/imports/api/callPromise';
+import {getChannelId} from '/imports/api/serverUtilities';
 
 const ChannelCollection = new Mongo.Collection('channels');
 
@@ -19,6 +21,7 @@ if(Meteor.isServer){
             _id: Match.Maybe(String),
             channelName: Match.Maybe(String),
             channelIcon: Match.Maybe(String),
+            channelId: Match.Maybe(String),
             mustHaves: Match.Maybe([String]),
             inclusions: Match.Maybe([String]),
             exclusions: Match.Maybe([String]),
@@ -93,11 +96,15 @@ if(Meteor.isServer){
 
 export const createNewChannel = (channel) => {    
     return new Promise(async (resolve, reject) => {
-        if(Meteor.isServer){
-            const channelIcon = await MeteorCall('getChannelIcon', channel.channelName).catch(error => logError('Fetch Channel Icon', error));
+        if(Meteor.isServer){            
+            const channelId = await getChannelId(channel.channelName).catch(error => logError('Fetch Channel ID', error.message));
+            const type = channelId ? 'id' : 'name'
+            const value = channelId ? channelId : channel.channelName;
+            const channelIcon = await MeteorCall('getChannelIcon', type, value).catch(error => logError('Fetch Channel Icon', error.message ? error.message : error));
             ChannelCollection.insert({
                 ...channel,
                 channelIcon: channelIcon,
+                channelId: channelId,
                 deleted: false,
                 active: true,
                 createdAt: new Date()
