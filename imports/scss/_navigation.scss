@@ -5,6 +5,16 @@ $nav-link-color: #bbc1c7;
 $nav-tabs-link-active-color: #9232d1;
 $nav-link-hover-color: rgb(197, 181, 242);
 
+#lolLogo {
+    max-height: 2rem;
+    padding-right: 1rem;
+    margin-top: -.25rem;
+}
+
+#lolName {
+    font-family: 'Poppins', sans-serif;
+}
+
 .nav-link.active {
     color: $nav-tabs-link-active-color;
 }
@@ -32,4 +42,12 @@ $nav-link-hover-color: rgb(197, 181, 242);
     margin-bottom: .25rem;
     margin-left: 0;
     margin-right: .5rem;
+}
+
+// remove toggler outline
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler-icon:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }

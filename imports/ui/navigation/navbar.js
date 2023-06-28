@@ -15,7 +15,7 @@ const Navbar = (props) => {
     return (
         <nav className="navbar navbar-expand-lg bg-primary fixed-top mainNav">
             <div className="container-fluid">
-                <a className="navbar-brand">L.o.L. (Louisville on Loan)</a>
+                <a className="navbar-brand"><img id="lolLogo" src="/icons/Racing_Louisville_FC_logo.svg-1024x1024.png"></img><span id="lolName">L.o.L.</span></a>
                 <button className="navbar-toggler navElement" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>                
