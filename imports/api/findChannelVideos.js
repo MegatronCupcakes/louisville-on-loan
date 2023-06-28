@@ -1,12 +1,9 @@
-import {Meteor} from 'meteor/meteor';
 import _ from 'underscore';
 import ytdl from 'ytdl-core';
-import browser from '/imports/api/puppeteer';
 import {isBad} from '/imports/api/utilities';
 import ChannelCollection from '/imports/api/channelCollection';
-import {getChannelUrl} from '/imports/api/utilities';
-
-const _pageWait = Meteor.settings.pageWait || 1000;
+import {findWithPuppeteer} from '/imports/api/adapters/finders/findWithPuppeteer';
+import {findWithRSS} from '/imports/api/adapters/finders/findWithRSS';
 
 const findChannelVideos = () => {
     return new Promise(async (resolve, reject) => {
@@ -17,7 +14,10 @@ const findChannelVideos = () => {
                     monitorData.mustHaves = monitorData.mustHaves.map((term) => {return term.toUpperCase()})
                     monitorData.inclusions = monitorData.inclusions.map((term) => {return term.toUpperCase()})
                     monitorData.exclusions = monitorData.exclusions.map((term) => {return term.toUpperCase()})
-                    const channelData = await _getVideosViaPuppeteer(monitorData);
+                    
+                    //const channelData = await findWithPuppeteer(monitorData);
+                    const channelData = await findWithRSS(monitorData);
+
                     const matchingVideoUrls = _getURLsForMatchingVideos(channelData, monitorData);
                     const videoData = await _getVideoDetails(matchingVideoUrls, monitorData);
                     resolve(videoData);
@@ -71,41 +71,5 @@ export const hasInclusion = (title, inclusions) => {
 export const noExclusions = (title, exclusions) => {
     return _.isEmpty(exclusions) || _.every(exclusions, (exclusion) => {
         return !title.toLowerCase().includes(exclusion.toLowerCase());
-    });
-}
-
-const _getVideosViaPuppeteer = (monitorData) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const linkSelector = 'a.yt-simple-endpoint';        
-            let context = await browser.createIncognitoBrowserContext();
-            let page = await context.newPage();
-            await page.goto(getChannelUrl(monitorData.channelName));
-            await page.waitForSelector(linkSelector);
-            const links = await new Promise(async (resolve, reject) => {                
-                const _getLinks = async (_linkCount) => {
-                    const _links = await page.evaluate(linkSelector => {
-                        return [...document.querySelectorAll(linkSelector)].map(anchor => {
-                            return {title: anchor.textContent, url: anchor.href};
-                        });
-                    }, linkSelector).catch(error => reject(error));
-                    if(_linkCount > 0 && _linkCount == _links.length){
-                        resolve(_links);
-                    } else {
-                        _.delay(() => {
-                            _getLinks(_links ? _links.length : 0);
-                        }, _pageWait);
-                    }                    
-                }
-                _getLinks(0);
-            });
-            await page.close();
-            await context.close();
-            page = null;
-            context = null;
-            resolve(links);
-        } catch(error){
-            reject(error);
-        }        
     });
 }

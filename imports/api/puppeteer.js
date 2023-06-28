@@ -3,8 +3,14 @@ import puppeteer from 'puppeteer';
 import path from 'node:path';
 
 let browserOptions = {
-    headless: "new",
-    args: ['--no-sandbox'],
+    headless: 'new',
+    //headless: false,
+    args: [
+        '--no-sandbox',
+        //'--disable-setuid-sandbox',
+        //'--disable-dev-shm-usage',
+        //'--disable-gpu'
+    ],
     protocolTimeout: 60 * 1000
 };
 
