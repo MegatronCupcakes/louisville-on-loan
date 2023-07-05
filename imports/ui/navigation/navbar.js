@@ -20,8 +20,11 @@ const Navbar = (props) => {
                     <span className="navbar-toggler-icon"></span>
                 </button>                
                 <div className="offcanvas offcanvas-end bg-primary" id="navbarContent" data-bs-scroll="true">
-                    <div className="offcanvas-header">
-                        <h5 className="offcanvas-title" id="offcanvasNavbarLabel">Louisville on Loan</h5>
+                    <div className="offcanvas-header">                        
+                        <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
+                            <img id="lolLogo" src="/icons/Racing_Louisville_FC_logo.svg-1024x1024.png"></img>
+                            Louisville on Loan
+                        </h5>
                         <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div className="offcanvas-body">
@@ -38,8 +41,8 @@ const Navbar = (props) => {
                             </li>
                             */}
                         </ul>
-                        {addButton}
-                        {exitButton}                        
+                        <div className="me-auto mb-2 mb-lg-0 offCanvasBtn">{addButton}</div>
+                        <div className="me-auto mb-2 mb-lg-0 offCanvasBtn">{exitButton}</div>
                     </div>                    
                 </div>                
             </div>

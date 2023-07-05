@@ -48,6 +48,16 @@
       "linux": "../public/icons/Racing_Louisville_FC_logo.svg-1024x1024.png",
       "win32": "../public/icons/Racing_Louisville_FC_logo.svg-1024x1024.ico"
     },
+    "splashScreen": {
+      "file": "public/splashScreen.html",
+      "windowConfiguration": {
+        "width": 600,
+        "height": 400,
+        "transparent": false,
+        "frame": false,
+        "alwaysOnTop": true
+      }
+    },
     "osx-sign": {
       "identity": null,
       "entitlements": null,
