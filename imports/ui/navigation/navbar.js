@@ -20,30 +20,32 @@ const Navbar = (props) => {
                     <span className="navbar-toggler-icon"></span>
                 </button>                
                 <div className="offcanvas offcanvas-end bg-primary" id="navbarContent" data-bs-scroll="true">
-                    <div className="offcanvas-header">                        
-                        <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
-                            <img id="lolLogo" src="/icons/Racing_Louisville_FC_logo.svg-1024x1024.png"></img>
-                            Louisville on Loan
-                        </h5>
-                        <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    </div>
-                    <div className="offcanvas-body">
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li className="nav-item">
-                                <a id="videos" className={`nav-link navElement ${props.isActiveNav('videos')}`} onClick={props.handleNavClick} data-bs-dismiss="offcanvas" data-bs-target="#navbarContent">videos</a>
-                            </li>
-                            <li className="nav-item">
-                                <a id="channels" className={`nav-link navElement ${props.isActiveNav('channels')}`} onClick={props.handleNavClick} data-bs-dismiss="offcanvas" data-bs-target="#navbarContent">channels</a>
-                            </li>
-                            {/*
-                            <li className="nav-item">
-                                <a id="settings" className={`nav-link navElement ${props.isActiveNav('settings')}`} onClick={props.handleNavClick} data-bs-dismiss="offcanvas" data-bs-target="#navbarContent">settings</a>
-                            </li>
-                            */}
-                        </ul>
-                        <div className="me-auto mb-2 mb-lg-0 offCanvasBtn">{addButton}</div>
-                        <div className="me-auto mb-2 mb-lg-0 offCanvasBtn">{exitButton}</div>
-                    </div>                    
+                    <div className="offcanvas-menu">
+                        <div className="offcanvas-header">                        
+                            <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
+                                <img id="lolLogo" src="/icons/Racing_Louisville_FC_logo.svg-1024x1024.png"></img>
+                                Louisville on Loan
+                            </h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div className="offcanvas-body">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li className="nav-item">
+                                    <a id="videos" className={`nav-link navElement ${props.isActiveNav('videos')}`} onClick={props.handleNavClick} data-bs-dismiss="offcanvas" data-bs-target="#navbarContent">videos</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a id="channels" className={`nav-link navElement ${props.isActiveNav('channels')}`} onClick={props.handleNavClick} data-bs-dismiss="offcanvas" data-bs-target="#navbarContent">channels</a>
+                                </li>
+                                {/*
+                                <li className="nav-item">
+                                    <a id="settings" className={`nav-link navElement ${props.isActiveNav('settings')}`} onClick={props.handleNavClick} data-bs-dismiss="offcanvas" data-bs-target="#navbarContent">settings</a>
+                                </li>
+                                */}
+                            </ul>
+                            <div className="me-auto mb-2 mb-lg-0 offCanvasBtn">{addButton}</div>
+                            <div className="me-auto mb-2 mb-lg-0 offCanvasBtn">{exitButton}</div>
+                        </div>
+                    </div>                                        
                 </div>                
             </div>
         </nav>
