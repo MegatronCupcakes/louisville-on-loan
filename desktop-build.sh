@@ -77,6 +77,10 @@ mv ./AppRun-x86_64 ./${PROJECTNAME}.AppDir/AppRun
 wget -nv "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${SYSARCH}.AppImage" >> /dev/null 2>&1
 chmod a+x ./appimagetool-${SYSARCH}.AppImage
 ARCH=${SYSARCH} ./appimagetool-${SYSARCH}.AppImage ${TEMPDIR}/${PROJECTNAME}.AppDir >> ${LOGFILE} 2>&1
+# Delete previous AppImage
+touch ${PROJECTDIR}/dist/${PLATFORM}/${PROJECTNAME}.AppImage
+rm ${PROJECTDIR}/dist/${PLATFORM}/${PROJECTNAME}.AppImage
+# Copy new AppImage to dist
 cp ${TEMPDIR}/${PROJECTNAME}-${SYSARCH}.AppImage ${PROJECTDIR}/dist/${PLATFORM}/${PROJECTNAME}.AppImage
 fi
 
