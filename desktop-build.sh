@@ -95,7 +95,7 @@ fi
 # ------------------------------
 # win32
 # ------------------------------
-if [ "${PLATFORM}" = "CYGWIN*" ]; then
+if ["${PLATFORM}" = "win32"] || [ "${PLATFORM}" = "CYGWIN*" ] || ["${PLATFORM}" = "mingw64_nt*"]; then
 mkdir -p ${PROJECTDIR}/dist/${PLATFORM}
 cp -R ${TEMPDIR}/package/. ${PROJECTDIR}/dist/${PLATFORM}/
 fi
