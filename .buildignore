@@ -13,6 +13,7 @@ start.sh
 version.desktop
 .meteor/local
 .electrify
+.vscode
 electrify.local.json
 tests
 util
