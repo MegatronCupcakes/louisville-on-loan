@@ -10,3 +10,4 @@ build_logs/
 env/
 .meteor/local
 .electrify
+.vscode
