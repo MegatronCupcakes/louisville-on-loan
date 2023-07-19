@@ -9,7 +9,7 @@
     "test": "./tests/test.sh",
     "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
     "visualize": "meteor --production --extra-packages bundle-visualizer",
-    "desktop": "meteor-desktop"
+    "desktop-build": "./desktop-build.sh"
   },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
