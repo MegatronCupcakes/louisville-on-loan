@@ -5,7 +5,7 @@
   "description": "Keep Up with Racing Louisville players on loan",
   "private": false,
   "scripts": {
-    "start": "meteor run",
+    "start": "./start.sh development",
     "test": "./tests/test.sh",
     "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
     "visualize": "meteor --production --extra-packages bundle-visualizer",
