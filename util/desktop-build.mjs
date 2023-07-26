@@ -29,12 +29,15 @@ const projectDescription = packageJson.description;
 const tempDir = path.join(os.tmpdir(), `${projectName}-build`);
 const projectTemp = path.join(tempDir, 'projectTemp');
 try {
+    // remove prior builds if found
     await deleteIfExists(tempDir);
+    await deleteIfExists(path.join(projectDir, 'dist', platform));
+    // make directories for current build
     await mkdtemp(tempDir);
     await mkdir(projectTemp, {recursive: true});
     await mkdir(path.join(tempDir, 'package'), {recursive: true});
     await mkdir(path.join(tempDir, 'electrify_temp'), {recursive: true});
-    await mkdir(path.join(projectTemp, '.electrify'), {recursive: true});
+    await mkdir(path.join(projectTemp, '.electrify'), {recursive: true});    
     await mkdir(path.join(projectDir, 'dist', platform), {recursive: true});
 } catch(error){
     _terminalError(error);
@@ -141,8 +144,12 @@ if(platform == 'linux'){
  * macOS
  */
 if(platform == 'darwin'){
-    console.log('macOS build; starting special handling.');    
-    await copyRecursive(path.join(tempDir, 'package'), path.join(projectDir, 'dist', platform));
+    console.log('macOS build; starting special handling.');
+    try {
+        await copyRecursive(path.join(tempDir, 'package'), path.join(projectDir, 'dist', platform));
+    } catch(error){
+        _terminalError(error);
+    }    
 }
 
 /**
@@ -150,7 +157,11 @@ if(platform == 'darwin'){
  */
 if(platform == 'win32'){
     console.log('windows build; starting special handling.');
-    await copyRecursive(path.join(tempDir, 'package'), path.join(projectDir, 'dist', platform));
+    try {        
+        await copyRecursive(path.join(tempDir, 'package'), path.join(projectDir, 'dist', platform));
+    } catch(error){
+        _terminalError(error);
+    }    
 }
 
 /**
