@@ -47,7 +47,7 @@ console.log('copying project files to build directory....');
 await new Promise((resolve, reject) => {
     const _exclusions = path.join(projectDir, '.buildignore');
     const _command = platform == 'win32' ? 
-    `xcopy ${projectDir}${path.sep} ${projectTemp}${path.sep} /v /s /e /r /h /y /exclude:${_exclusions}` : 
+    `xcopy "${projectDir}${path.sep}" "${projectTemp}${path.sep}" /v /s /e /r /h /y /exclude:${_exclusions}` : 
     `rsync -avr --exclude-from='${_exclusions}' ${projectDir}${path.sep} ${projectTemp}${path.sep}`;
     exec(_command, error => {
         if(error) reject(error);
@@ -61,7 +61,7 @@ await new Promise((resolve, reject) => {
  */
 console.log('installing npm dependencies in build directory....');
 await new Promise((resolve, reject) => {    
-    exec(`${npmPath} install --production`, {cwd: projectTemp}, error => {
+    exec(`"${npmPath}" install --production`, {cwd: projectTemp}, error => {
         if(error) reject(error);
         resolve();
     });
@@ -75,7 +75,7 @@ console.log('Electrifying.....');
 try {
     await writeFile(path.join(projectTemp, '.electrify', 'electrify.json'), JSON.stringify({"preserve_db": true}, null, 4));
     await new Promise((resolve, reject) => {
-        const _command = `electrify package --settings ${path.join('.', 'settings', 'desktop.json')} --temp ${path.join(tempDir, 'electrify_temp')} --output ${path.join(tempDir, 'package')}`;
+        const _command = `electrify package --settings "${path.join('.', 'settings', 'desktop.json')}" --temp ${path.join(tempDir, 'electrify_temp')} --output "${path.join(tempDir, 'package')}"`;
         exec(_command, {cwd: projectTemp}, error => {
             if(error) reject(error);
             resolve();
@@ -90,7 +90,7 @@ try {
  */
 console.log('Installing Puppeteer....');
 await new Promise((resolve, reject) => {
-    const _command = `${nodePath} ${path.join(projectDir, 'util', 'electrify_puppeteer.js')} ${path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`)}`;
+    const _command = `"${nodePath}" "${path.join(projectDir, 'util', 'electrify_puppeteer.js')}" "${path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}"`)}`;
     exec(_command, {cwd: projectTemp}, error => {
         if(error) reject(error);
         resolve();
