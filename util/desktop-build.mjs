@@ -13,7 +13,6 @@ const _terminalError = (error) => {
 /**
  * gather project details
  */
-const nodeVersion = process.version;
 const nodePath = process.execPath;
 const npmPath = path.join(path.dirname(nodePath), 'npm');
 const platform = os.platform();
@@ -36,6 +35,7 @@ try {
     await mkdir(path.join(tempDir, 'package'), {recursive: true});
     await mkdir(path.join(tempDir, 'electrify_temp'), {recursive: true});
     await mkdir(path.join(projectTemp, '.electrify'), {recursive: true});
+    await mkdir(path.join(projectDir, 'dist', platform), {recursive: true});
 } catch(error){
     _terminalError(error);
 }
@@ -141,7 +141,8 @@ if(platform == 'linux'){
  * macOS
  */
 if(platform == 'darwin'){
-    console.log('macOS build; starting special handling.');
+    console.log('macOS build; starting special handling.');    
+    await copyRecursive(path.join(tempDir, 'package'), path.join(projectDir, 'dist', platform));
 }
 
 /**
@@ -149,6 +150,7 @@ if(platform == 'darwin'){
  */
 if(platform == 'win32'){
     console.log('windows build; starting special handling.');
+    await copyRecursive(path.join(tempDir, 'package'), path.join(projectDir, 'dist', platform));
 }
 
 /**
