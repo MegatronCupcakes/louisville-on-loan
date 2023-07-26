@@ -3,10 +3,11 @@ dist
 ToDos.txt
 build_logs
 node_modules
-build_logs
 env
-settings
+settings/development.json
+settings/production.json
 desktop-build.sh
+docker-run.sh
 docker-build.sh
 test_bundle.sh
 start.sh
@@ -15,5 +16,3 @@ version.desktop
 .electrify
 .vscode
 electrify.local.json
-tests
-util
