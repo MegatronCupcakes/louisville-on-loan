@@ -35,7 +35,7 @@ try {
     await mkdir(projectTemp, {recursive: true});
     await mkdir(path.join(tempDir, 'package'), {recursive: true});
     await mkdir(path.join(tempDir, 'electrify_temp'), {recursive: true});
-    await mkdir(path.join(projectDir, '.electrify'), {recursive: true});
+    await mkdir(path.join(projectTemp, '.electrify'), {recursive: true});
 } catch(error){
     _terminalError(error);
 }
@@ -73,7 +73,6 @@ await new Promise((resolve, reject) => {
  */
 console.log('Electrifying.....');
 try {
-    await mkdir(path.join(projectTemp, '.electrify'), {recursive: true});
     await writeFile(path.join(projectTemp, '.electrify', 'electrify.json'), JSON.stringify({"preserve_db": true}, null, 4));
     await new Promise((resolve, reject) => {
         const _command = `electrify package --settings ${path.join('.', 'settings', 'desktop.json')} --temp ${path.join(tempDir, 'electrify_temp')} --output ${path.join(tempDir, 'package')}`;
