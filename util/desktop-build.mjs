@@ -1,8 +1,9 @@
 import {mkdtemp, mkdir, copyFile, readFile, writeFile, chmod} from 'node:fs/promises';
-import os from 'node:os';
+import os, { arch } from 'node:os';
 import path from 'node:path';
 import {exec} from 'node:child_process';
 import {glob} from 'glob';
+import electronInstaller from 'electron-winstaller';
 import {copyRecursive, deleteIfExists, fetchRemote} from './file_utilities.mjs';
 
 const _terminalError = (error) => {
@@ -22,6 +23,7 @@ const packageJsonString = await readFile(path.join(projectDir, 'package.json')).
 const packageJson = JSON.parse(packageJsonString);
 const projectName = packageJson.name;
 const projectDescription = packageJson.description;
+const projectVersion = packageJson.version;
 
 /**
  * setup build directories
@@ -79,7 +81,13 @@ try {
     await writeFile(path.join(projectTemp, '.electrify', 'electrify.json'), JSON.stringify({"preserve_db": true}, null, 4));
     await new Promise((resolve, reject) => {
         const _command = `electrify package --settings "${path.join('.', 'settings', 'desktop.json')}" --temp ${path.join(tempDir, 'electrify_temp')} --output "${path.join(tempDir, 'package')}"`;
-        exec(_command, {cwd: projectTemp}, error => {
+        exec(_command, {
+            cwd: projectTemp,
+            env: {
+                ...process.env,
+                LOGELECTRIFY: 'ALL'
+            }
+        }, error => {
             if(error) reject(error);
             resolve();
         });
@@ -157,8 +165,33 @@ if(platform == 'darwin'){
  */
 if(platform == 'win32'){
     console.log('windows build; starting special handling.');
-    try {        
-        await copyRecursive(path.join(tempDir, 'package'), path.join(projectDir, 'dist', platform));
+    const _tempPath = path.join(path.parse(tempDir).root, '_temp');
+    // dashes in name causes issues with squirrel    
+    const _cleanName = projectName.split('-').join('');    
+    
+    try {
+        // clear dist directory
+        await deleteIfExists(path.join(projectDir, 'dist', platform));
+        await mkdir(path.join(projectDir, 'dist', platform), {recursive: true});
+        // clear temporary directory (needed to keep paths short for squirrel)
+        await deleteIfExists(_tempPath);
+        await mkdir(_tempPath, {recursive: true});
+        await copyRecursive(path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`), _tempPath);
+        // rename exe using _cleanName to satisfy squirrel's restrictions on dashes in file names
+        await copyFile(path.join(_tempPath, `${projectName}.exe`), path.join(_tempPath, `${_cleanName}.exe`));
+        await deleteIfExists(path.join(_tempPath, `${projectName}.exe`));
+        // create windows installer
+        await electronInstaller.createWindowsInstaller({
+            version: projectVersion,
+            description: 'follow Racing Louisville players on loan',
+            appDirectory: _tempPath,
+            outputDirectory: path.join(projectDir, 'dist', platform),
+            authors: 'MegatronCupcakes',
+            exe: `${projectName}.exe`,
+            setupExe: `${projectName}-setup.exe`,
+            noMsi: true
+        });
+        await deleteIfExists(_tempPath);
     } catch(error){
         _terminalError(error);
     }    
