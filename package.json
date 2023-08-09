@@ -69,5 +69,8 @@
       "appleIdPassword": null
     }
   },
-  "electrifyDependencies": {}
+  "electrifyDependencies": {},
+  "devDependencies": {
+    "electron-winstaller": "^5.1.0"
+  }
 }
