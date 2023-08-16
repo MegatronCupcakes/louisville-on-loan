@@ -1,9 +1,10 @@
-import {mkdtemp, mkdir, copyFile, readFile, writeFile, chmod} from 'node:fs/promises';
+import {mkdir, copyFile, readFile, writeFile, chmod} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {exec} from 'node:child_process';
 import {glob} from 'glob';
 import {copyRecursive, deleteIfExists, fetchRemote} from './file_utilities.mjs';
+import {setupBuild} from './common_build_steps.mjs';
 
 const _terminalError = (error) => {
     console.error(error);
@@ -11,10 +12,11 @@ const _terminalError = (error) => {
 };
 
 /**
- * gather project details
+ * ------------------------------
+ * Establish build data
+ * ------------------------------
  */
 const nodePath = process.execPath;
-const npmPath = path.join(path.dirname(nodePath), 'npm');
 const platform = os.platform();
 const sysarch = os.arch();
 const projectDir = process.cwd().includes('util') ? path.join(process.cwd(), '..') : process.cwd();
@@ -22,57 +24,19 @@ const packageJsonString = await readFile(path.join(projectDir, 'package.json')).
 const packageJson = JSON.parse(packageJsonString);
 const projectName = packageJson.name;
 const projectDescription = packageJson.description;
+const logLabel = `[${projectName}-electron-build]`;
 
 /**
- * setup build directories
+ * ------------------------------
+ * Begin Build
+ * ------------------------------
  */
-const tempDir = path.join(os.tmpdir(), `${projectName}-build`);
-const projectTemp = path.join(tempDir, 'projectTemp');
-try {
-    // remove prior builds if found
-    await deleteIfExists(tempDir);
-    await deleteIfExists(path.join(projectDir, 'dist', platform));
-    // make directories for current build
-    await mkdtemp(tempDir);
-    await mkdir(projectTemp, {recursive: true});
-    await mkdir(path.join(tempDir, 'package'), {recursive: true});
-    await mkdir(path.join(tempDir, 'electrify_temp'), {recursive: true});
-    await mkdir(path.join(projectTemp, '.electrify'), {recursive: true});    
-    await mkdir(path.join(projectDir, 'dist', platform), {recursive: true});
-} catch(error){
-    _terminalError(error);
-}
+const [tempDir, projectTemp] = await setupBuild(projectName, projectDir, platform, logLabel).catch(error => _terminalError(error));
 
 /**
- * Copy project to projectTemp for clean build
- */
-console.log('copying project files to build directory....');
-await new Promise((resolve, reject) => {
-    const _exclusions = path.join(projectDir, '.buildignore');
-    const _command = platform == 'win32' ? 
-    `xcopy "${projectDir}${path.sep}" "${projectTemp}${path.sep}" /v /s /e /r /h /y /exclude:${_exclusions}` : 
-    `rsync -avr --exclude-from='${_exclusions}' ${projectDir}${path.sep} ${projectTemp}${path.sep}`;
-    exec(_command, error => {
-        if(error) reject(error);
-        resolve();
-    });
-})
-.catch(error => _terminalError(error));
-
-/**
- * Install npm dependencies
- */
-console.log('installing npm dependencies in build directory....');
-await new Promise((resolve, reject) => {    
-    exec(`"${npmPath}" install --production`, {cwd: projectTemp}, error => {
-        if(error) reject(error);
-        resolve();
-    });
-})
-.catch(error => _terminalError(error));
-
-/**
- * Electrifying
+ * ------------------------------
+ * Electrify
+ * ------------------------------
  */
 console.log('Electrifying.....');
 try {
@@ -89,7 +53,9 @@ try {
 }
 
 /**
- * include Puppeteer
+ * ------------------------------
+ * Install Puppeteer (may remove in future)
+ * ------------------------------
  */
 console.log('Installing Puppeteer....');
 await new Promise((resolve, reject) => {
@@ -102,7 +68,9 @@ await new Promise((resolve, reject) => {
 .catch(error => _terminalError(error));
 
 /**
- * LINUX: create AppImage
+ * ------------------------------
+ * Linux Post-processing
+ * ------------------------------
  */
 if(platform == 'linux'){    
     console.log('linux build; starting special handling.');
@@ -141,7 +109,9 @@ if(platform == 'linux'){
 }
 
 /**
- * macOS
+ * ------------------------------
+ * macOS Post-processing
+ * ------------------------------
  */
 if(platform == 'darwin'){
     console.log('macOS build; starting special handling.');
@@ -153,7 +123,9 @@ if(platform == 'darwin'){
 }
 
 /**
- * Windows
+ * ------------------------------
+ * Windows Post-processing
+ * ------------------------------
  */
 if(platform == 'win32'){
     console.log('windows build; starting special handling.');
@@ -165,7 +137,9 @@ if(platform == 'win32'){
 }
 
 /**
- * CLEAN UP
+ * ------------------------------
+ * Clean-up
+ * ------------------------------
  */
 console.log('cleaning up....');
 await deleteIfExists(tempDir).catch(error => _terminalError(error));
