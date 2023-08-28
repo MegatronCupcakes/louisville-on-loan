@@ -55,7 +55,7 @@ export const setupBuild = (projectName, projectDir, buildPlatform, logLabel) => 
                 const packageJsonString = await readFile(path.join(projectTemp, 'package.json'));
                 const packageJson = JSON.parse(packageJsonString);
                 packageJson.name = cleanProjectName(packageJson.name);
-                await writeFile(JSON.stringify(packageJson, null, 4), path.join(projectTemp, 'package.json'));
+                await writeFile(path.join(projectTemp, 'package.json'), JSON.stringify(packageJson, null, 4));
             } catch(error){
                 reject(error);
             }            
