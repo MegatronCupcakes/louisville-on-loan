@@ -5,7 +5,7 @@ import {exec} from 'node:child_process';
 import {glob} from 'glob';
 import electronInstaller from 'electron-winstaller';
 import {copyRecursive, deleteIfExists, fetchRemote} from './file_utilities.mjs';
-import {setupBuild} from './common_build_steps.mjs';
+import {setupBuild, cleanProjectName} from './common_build_steps.mjs';
 
 const _terminalError = (error) => {
     console.error(error);
@@ -138,7 +138,7 @@ if(platform == 'win32'){
     console.log('windows build; starting special handling.');
     const _tempPath = path.join(path.parse(tempDir).root, '_temp');
     // dashes in name causes issues with squirrel    
-    const _cleanName = projectName.split('-').join('');    
+    const _cleanName = cleanProjectName(projectName);    
     
     try {
         // clear dist directory

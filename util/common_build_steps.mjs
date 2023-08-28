@@ -1,4 +1,4 @@
-import {mkdtemp, mkdir} from 'node:fs/promises';
+import {mkdtemp, mkdir, readFile, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {exec} from 'node:child_process';
@@ -47,6 +47,21 @@ export const setupBuild = (projectName, projectDir, buildPlatform, logLabel) => 
         .catch(error => reject(error));
 
         /**
+         * re-write package.json with a "clean name" for windows builds;
+         * squirrel will not accept dashes in project name
+         */
+        if(buildPlatform == 'win32'){
+            try {
+                const packageJsonString = await readFile(path.join(projectTemp, 'package.json'));
+                const packageJson = JSON.parse(packageJsonString);
+                packageJson.name = cleanProjectName(packageJson.name);
+                await writeFile(JSON.stringify(packageJson, null, 4), path.join(projectTemp, 'package.json'));
+            } catch(error){
+                reject(error);
+            }            
+        }
+
+        /**
          * Install npm dependencies for Electron Builds
          */
         if(buildPlatform != "docker"){
@@ -61,4 +76,8 @@ export const setupBuild = (projectName, projectDir, buildPlatform, logLabel) => 
         }        
         resolve([tempDir, projectTemp]);
     });
+}
+
+export const cleanProjectName = (projectName) => {
+    return projectName.split('-').join('');
 }
