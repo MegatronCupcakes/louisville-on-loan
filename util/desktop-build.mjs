@@ -23,8 +23,9 @@ const sysarch = os.arch();
 const projectDir = process.cwd().includes('util') ? path.join(process.cwd(), '..') : process.cwd();
 const packageJsonString = await readFile(path.join(projectDir, 'package.json')).catch(error => _terminalError(error));
 const packageJson = JSON.parse(packageJsonString);
-const projectName = packageJson.name;
+const projectName = platform == 'win32' ? cleanProjectName(packageJson.name) : packageJson.name;
 const projectDescription = packageJson.description;
+const projectVersion = packageJson.version;
 const logLabel = `[${projectName}-electron-build]`;
 
 /**
@@ -137,8 +138,6 @@ if(platform == 'darwin'){
 if(platform == 'win32'){
     console.log('windows build; starting special handling.');
     const _tempPath = path.join(path.parse(tempDir).root, '_temp');
-    // dashes in name causes issues with squirrel    
-    const _cleanName = cleanProjectName(projectName);    
     
     try {
         // clear dist directory
@@ -148,9 +147,6 @@ if(platform == 'win32'){
         await deleteIfExists(_tempPath);
         await mkdir(_tempPath, {recursive: true});
         await copyRecursive(path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`), _tempPath);
-        // rename exe using _cleanName to satisfy squirrel's restrictions on dashes in file names
-        await copyFile(path.join(_tempPath, `${projectName}.exe`), path.join(_tempPath, `${_cleanName}.exe`));
-        await deleteIfExists(path.join(_tempPath, `${projectName}.exe`));
         // create windows installer
         await electronInstaller.createWindowsInstaller({
             version: projectVersion,
