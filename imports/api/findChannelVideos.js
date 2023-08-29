@@ -48,7 +48,6 @@ const findChannelVideos = () => {
                             default:
                                 channelData = await findWithRSS(monitorData);
                                 videoData = await _getAdditionalYoutubeData(channelData, monitorData);
-                                console.log(`videoData: ${JSON.stringify(videoData, null, 4)}`);
                                 _resolve(videoData);
                         }
                     } catch(_error){
