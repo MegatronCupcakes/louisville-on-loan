@@ -8,7 +8,7 @@ export const findWithRSS = (monitorData) => {
             const feed = await fetch(url);
             const feedJson = JSON.parse(convert.xml2json(await feed.text(), {compact: true, trim: true}));
             const links = feedJson.feed.entry.map((entry) => {
-                return {title: entry.title._text, url: entry.link._attributes.href};
+                return {title: entry.title._text, url: entry.link._attributes.href, source: 'youtube'};
             });            
             resolve(links);
         } catch(error){

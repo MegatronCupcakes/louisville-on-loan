@@ -12,7 +12,7 @@ const poll = async () => {
         const matchingVideos = await findChannelVideos();
         await Promise.all(matchingVideos.map((video) => {
             return new Promise(async (resolve, reject) => {
-                if(JobCollection.findOne({youtubeId: video.videoId})){
+                if(video.videoId && JobCollection.findOne({youtubeId: video.videoId})){
                     // respect any changes made to the job locally; only update the start time.
                     JobCollection.update({youtubeId: video.videoId}, {$set: {
                         scheduledDate: video.liveBroadcastDetails ? new Date(video.liveBroadcastDetails.startTimestamp) : new Date(video.uploadDate)
@@ -20,6 +20,16 @@ const poll = async () => {
                         if(error) reject(error);
                         resolve();
                     });
+                } else if(video.source == 'facebook'){
+                    if(!JobCollection.findOne({fbFileName: video.fbFileName})){
+                        await createNewJob({
+                            url: video.url,
+                            scheduledDate: new Date(),
+                            title: video.title,
+                            fbFileName: video.fbFileName,
+                            source: video.source
+                        }).catch(error => reject(error));
+                    }                    
                 } else {
                     // create a new job.
                     await createNewJob({
@@ -31,10 +41,11 @@ const poll = async () => {
                         channelId: video.channelId,
                         channelUrl: video.ownerProfileUrl,
                         channel_id: video.channel_id,
-                        thumbnail: video.thumbnails[video.thumbnails.length - 1].url
-                    }).catch(error => reject(error));
-                    resolve();
+                        thumbnail: video.thumbnails[video.thumbnails.length - 1].url,
+                        source: video.source
+                    }).catch(error => reject(error));                                        
                 }
+                resolve();
             });
         }));   
     } catch(error){

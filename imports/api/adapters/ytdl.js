@@ -8,7 +8,7 @@ import ffmpeg from 'ffmpeg-static';
 import {pathExists, deleteFile} from '/imports/api/browseFileSystem';
 import {downloadComplete} from "/imports/api/adapters/shared/videoValidator";
 
-export const DownloadVideo = (job, jobFormats, downloadDir, controller) => {        
+export const DownloadWithYtdl = (job, jobFormats, downloadDir, controller) => {        
     return new Promise(async (resolve, reject) => {    
         try {
             const downloadPath = path.join(downloadDir, `${job._id}.mp4`);

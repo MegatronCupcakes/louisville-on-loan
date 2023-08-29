@@ -16,7 +16,8 @@
             "exclusions": [
                 "ask",
                 "anniversary"
-            ]
+            ],
+            "source": "youtube"
         },
         {
             "channelName": "AutoalexCars",
@@ -26,7 +27,20 @@
             "inclusions": [
             ],
             "exclusions": [
-            ]
+            ],
+            "source": "youtube"
+        },
+        {
+            "channelName": "tigresoficial",
+            "facebookName": "ClubTigresFemenil",
+            "mustHaves": [
+                "Tigres"
+            ],
+            "inclusions": [
+            ],
+            "exclusions": [
+            ],
+            "source": "facebook"
         }
     ]
 }
