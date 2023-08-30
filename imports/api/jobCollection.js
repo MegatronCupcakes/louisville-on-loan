@@ -32,6 +32,8 @@ if(Meteor.isServer){
             updatedAt: Match.Maybe(Date),
             deleted: Match.Maybe(Boolean),
             processed: Match.Maybe(Boolean),
+            source: Match.Maybe(String),
+            fbFileName: Match.Maybe(String)
         });
     }
 

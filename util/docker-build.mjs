@@ -70,7 +70,7 @@ const dockerfile = `# Dockerfile\n` +
     `    sed -i 's/^# *\\\(en_US.UTF-8\\)/\\\\1/' /etc/locale.gen &&  \\\n` +
     `    locale-gen\n` +
     `RUN apt-get update && \\\n` +
-    `    apt-get install -y python ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 \\\n` +
+    `    apt-get install -y curl python ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 \\\n` +
     `    libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libasound2 libcurl4-openssl-dev && \\\n` +
     `    apt-get install --fix-missing && \\\n` +
     `    npm install -g puppeteer@${puppeteerVersion} --unsafe-perm\n` +

@@ -6,7 +6,8 @@ import {defaultPaths} from '/imports/api/defaultPaths';
 import {isBad} from '/imports/api/utilities';
 
 // download adapters
-import {DownloadVideo} from '/imports/api/adapters/ytdl.js';
+import {DownloadWithYtdl} from '/imports/api/adapters/ytdl.js';
+import {DownloadWithCurl} from '/imports/api/adapters/curl.js';
 import {retryWait} from '/imports/api/adapters/shared/retryLib';
 
 // Meteor is based on Node 14 so polyfill for AbortController is needed
@@ -71,7 +72,16 @@ const downloadVideo = (job) => {
                                 _reject(new Error(`(${job._id}) private video`));
                             } else {
                                 JobCollection.update({_id: job._id}, {$set: {'downloadProgress.formats': jobFormats}});
-                                DownloadVideo(job, jobFormats, defaultPaths.downloadDir, controller)
+                                let adapter;
+                                switch(job.source){
+                                    case 'facebook':
+                                        adapter = DownloadWithCurl;
+                                        break;
+                                    default:
+                                        adapter = DownloadWithYtdl;
+
+                                }
+                                adapter(job, jobFormats, defaultPaths.downloadDir, controller)
                                 .then(fn)
                                 .catch((error) => {
                                     JobCollection.update({_id: job._id}, {$push: {'downloadProgress.error': error.message}});

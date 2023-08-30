@@ -29,7 +29,9 @@ if(Meteor.isServer){
             deleted: Match.Maybe(Boolean),
             active: Match.Maybe(Boolean),
             createdAt: Match.Maybe(Date),
-            updatedAt: Match.Maybe(Date)
+            updatedAt: Match.Maybe(Date),
+            facebookName: Match.Maybe(String),
+            source: Match.Maybe(String)
         });
     }
 

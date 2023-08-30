@@ -4,23 +4,57 @@ import {isBad} from '/imports/api/utilities';
 import ChannelCollection from '/imports/api/channelCollection';
 import {findWithPuppeteer} from '/imports/api/adapters/finders/findWithPuppeteer';
 import {findWithRSS} from '/imports/api/adapters/finders/findWithRSS';
+import {findFacebookVideos} from '/imports/api/adapters/finders/findFromFacebook';
 
 const findChannelVideos = () => {
     return new Promise(async (resolve, reject) => {
         try {
             const monitoredChannels = ChannelCollection.find({active: true, deleted: false}).fetch() || [];
             const allMatchingVideos = _.flatten(await Promise.all(monitoredChannels.map((monitorData) => {
-                return new Promise(async (resolve, reject) => {
+                return new Promise(async (_resolve, _reject) => {
                     monitorData.mustHaves = monitorData.mustHaves.map((term) => {return term.toUpperCase()})
                     monitorData.inclusions = monitorData.inclusions.map((term) => {return term.toUpperCase()})
                     monitorData.exclusions = monitorData.exclusions.map((term) => {return term.toUpperCase()})
                     
-                    //const channelData = await findWithPuppeteer(monitorData);
-                    const channelData = await findWithRSS(monitorData);
-
-                    const matchingVideoUrls = _getURLsForMatchingVideos(channelData, monitorData);
-                    const videoData = await _getVideoDetails(matchingVideoUrls, monitorData);
-                    resolve(videoData);
+                    const _getAdditionalYoutubeData = (_channelData, _monitorData) => {
+                        return new Promise(async (__resolve, __reject) => {
+                            try{
+                                const _matchingVideoUrls = _getURLsForMatchingVideos(_channelData, _monitorData);
+                                const _videoData = await _getVideoDetails(_matchingVideoUrls, _monitorData);
+                                __resolve(_videoData);
+                            } catch(_error){
+                                __reject(_error);
+                            }
+                            
+                        });
+                    }
+                    try {
+                        let channelData, videoData;
+                        switch(monitorData.source){
+                            case 'facebook':
+                                channelData = await findWithPuppeteer(monitorData);                                
+                                channelData = await findFacebookVideos(_getMatchingVideos(channelData, monitorData), monitorData);                                
+                                _resolve(channelData);
+                                break;
+                            case 'youtube':
+                                channelData = await findWithRSS(monitorData);
+                                videoData = await _getAdditionalYoutubeData(channelData, monitorData);
+                                _resolve(videoData);
+                                break;
+                            case 'scrape':
+                                channelData = await findWithPuppeteer(monitorData);
+                                videoData = await _getAdditionalYoutubeData(channelData, monitorData);
+                                _resolve(videoData);
+                                break;
+                            default:
+                                channelData = await findWithRSS(monitorData);
+                                videoData = await _getAdditionalYoutubeData(channelData, monitorData);
+                                _resolve(videoData);
+                        }
+                    } catch(_error){
+                        _reject(_error);
+                    }                    
+                    
                 });
             })));
             resolve(allMatchingVideos);
@@ -50,10 +84,14 @@ const _getVideoDetails = (links, monitorData) => {
     });
 }
 
-const _getURLsForMatchingVideos = (results, monitorData) => {
+const _getMatchingVideos = (results, monitorData) => {
     return _.compact(_.uniq(_.filter(results, (video) => {
         return hasMustHaves(video.title, monitorData.mustHaves) && hasInclusion(video.title, monitorData.inclusions) && noExclusions(video.title, monitorData.exclusions);
-    }).map((video) => {return video.url})));
+    }).map((video) => {return video})));
+}
+
+const _getURLsForMatchingVideos = (results, monitorData) => {
+    return _getMatchingVideos(results, monitorData).map((video) => {return video.url});
 }
 
 export const hasMustHaves = (title, mustHaves) => {
