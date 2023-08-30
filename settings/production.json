@@ -22,6 +22,19 @@
                 "shot",
                 "Preview"
             ]
+        },
+        {
+            "channelName": "tigresoficial",
+            "facebookName": "ClubTigresFemenil",
+            "mustHaves": [
+                "Tigres",
+                "vs."
+            ],
+            "inclusions": [
+            ],
+            "exclusions": [
+            ],
+            "source": "facebook"
         }
     ]
 }

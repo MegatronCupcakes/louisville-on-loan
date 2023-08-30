@@ -23,13 +23,15 @@
                 "Mini Match",
                 "shot",
                 "Preview"
-            ]
+            ],
+            "source": "youtube"
         },
         {
             "channelName": "tigresoficial",
             "facebookName": "ClubTigresFemenil",
             "mustHaves": [
-                "Tigres"
+                "Tigres",
+                "vs."
             ],
             "inclusions": [
             ],
