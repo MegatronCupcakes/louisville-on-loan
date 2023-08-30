@@ -32,7 +32,8 @@ const findChannelVideos = () => {
                         let channelData, videoData;
                         switch(monitorData.source){
                             case 'facebook':
-                                channelData = await findFacebookVideos(monitorData);
+                                channelData = await findWithPuppeteer(monitorData);                                
+                                channelData = await findFacebookVideos(_getMatchingVideos(channelData, monitorData), monitorData);                                
                                 _resolve(channelData);
                                 break;
                             case 'youtube':
@@ -83,10 +84,14 @@ const _getVideoDetails = (links, monitorData) => {
     });
 }
 
-const _getURLsForMatchingVideos = (results, monitorData) => {
+const _getMatchingVideos = (results, monitorData) => {
     return _.compact(_.uniq(_.filter(results, (video) => {
         return hasMustHaves(video.title, monitorData.mustHaves) && hasInclusion(video.title, monitorData.inclusions) && noExclusions(video.title, monitorData.exclusions);
-    }).map((video) => {return video.url})));
+    }).map((video) => {return video})));
+}
+
+const _getURLsForMatchingVideos = (results, monitorData) => {
+    return _getMatchingVideos(results, monitorData).map((video) => {return video.url});
 }
 
 export const hasMustHaves = (title, mustHaves) => {

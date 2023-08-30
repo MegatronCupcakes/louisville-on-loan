@@ -27,7 +27,8 @@ const poll = async () => {
                             scheduledDate: new Date(),
                             title: video.title,
                             fbFileName: video.fbFileName,
-                            source: video.source
+                            source: video.source,
+                            thumbnail: video.thumbnail
                         }).catch(error => reject(error));
                     }                    
                 } else {
