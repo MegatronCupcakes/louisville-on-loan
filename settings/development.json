@@ -22,7 +22,8 @@
         {
             "channelName": "AutoalexCars",
             "mustHaves": [
-                "challenge"
+                "challenge",
+                "van"
             ],
             "inclusions": [
             ],

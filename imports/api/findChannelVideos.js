@@ -32,8 +32,9 @@ const findChannelVideos = () => {
                         let channelData, videoData;
                         switch(monitorData.source){
                             case 'facebook':
-                                channelData = await findWithPuppeteer(monitorData);                                
-                                channelData = await findFacebookVideos(_getMatchingVideos(channelData, monitorData), monitorData);                                
+                                channelData = await findWithPuppeteer(monitorData);
+                                const matching = _getMatchingVideos(channelData, monitorData);
+                                channelData = await findFacebookVideos(matching, monitorData);                                
                                 _resolve(channelData);
                                 break;
                             case 'youtube':
@@ -77,7 +78,8 @@ const _getVideoDetails = (links, monitorData) => {
             } else {
                 return {
                     ...video.videoDetails,
-                    channel_id: monitorData._id
+                    channel_id: monitorData._id,
+                    source: monitorData.source
                 };
             }            
         })));

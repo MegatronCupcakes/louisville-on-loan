@@ -14,6 +14,12 @@ const _terminalError = (error) => {
  * Establish build data
  * ------------------------------
  */
+const meteorNodeVersion = '14.21.4';
+// Meteor is still reliant on node 14 and is providing additional long-term support for it.
+// This means we need to pull the latest node binaries from meteor instead of using standard
+// node binaries.  We do this by building our own Docker base image since the one provided by
+// meteor is woefully out of data. Our image is 'megatroncupcakes/node:${meteorNodeVersion}'
+
 const projectDir = process.cwd().includes('util') ? path.join(process.cwd(), '..') : process.cwd();
 const packageJsonString = await readFile(path.join(projectDir, 'package.json')).catch(error => _terminalError(error));
 const packageJson = JSON.parse(packageJsonString);
@@ -24,7 +30,7 @@ const meteorString = meteorBuffer.toString().trim();
 const meteorVersion = meteorString.split('@')[1].trim();
 const puppeteerVersion = packageJson.dependencies.puppeteer.replace('^','');
 const logLabel = `[${projectName}-docker-build]`;
-const fromImage = `node:${nodeVersion}-bullseye-slim`;
+const fromImage = `megatroncupcakes/node:${meteorNodeVersion}`;
 const containerName=`meteor-build-${projectName}`;
 const date = new Date();
 const dateString = `${Number(date.getMonth()) + 1}-${date.getDate()}-${date.getFullYear()}`;
@@ -35,14 +41,7 @@ const dateTag = `${projectName}:${dateString}`;
  * Begin Build
  * ------------------------------
  */
-console.log(`${logLabel} Pulling base image: "${fromImage}"`);
-await new Promise((resolve, reject) => {
-    const _command = `docker pull ${fromImage}`;
-    exec(_command, error => {
-        if(error) reject(error);
-        resolve();
-    });
-}).catch(error => _terminalError(error));
+
 const [tempDir, projectTemp] = await setupBuild(projectName, projectDir, "docker", logLabel).catch(error => _terminalError(error));
 
 console.log(`\n\n${logLabel} Beginning Docker build:\n` + 
@@ -70,7 +69,7 @@ const dockerfile = `# Dockerfile\n` +
     `    sed -i 's/^# *\\\(en_US.UTF-8\\)/\\\\1/' /etc/locale.gen &&  \\\n` +
     `    locale-gen\n` +
     `RUN apt-get update && \\\n` +
-    `    apt-get install -y curl python ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 \\\n` +
+    `    apt-get install -y curl python2 ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 \\\n` +
     `    libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libasound2 libcurl4-openssl-dev && \\\n` +
     `    apt-get install --fix-missing && \\\n` +
     `    npm install -g puppeteer@${puppeteerVersion} --unsafe-perm\n` +
@@ -89,12 +88,15 @@ const meteorBuildScript = `#!/bin/sh\n` +
     `export NPM_CONFIG_PREFIX=/home/node/.npm-global\n` +
     'export PATH=/root/.meteor:/home/node/.npm-global/bin:${PATH}\n' +
     `echo ${logLabel} Meteor container started, installing tools\n` +
+    `apt-get update && apt-get install -y git jq xargs\n` +
     `npm install -g meteor@${meteorVersion} --unsafe-perm\n` +
     `echo ${logLabel} Creating Meteor build project\n` +
     `cd /dockerhost/\n` +
     `meteor create ${projectName} --minimal --allow-superuser\n` +
     `cp -R ./source/. ./${projectName}/\n` +
     `cd ./${projectName}\n` +
+    `git config --global url."https://github.com/".insteadOf git@github.com:\n` +
+    `git config --global url."https://".insteadOf git://\n` +
     `echo ${logLabel} Installing NPM build dependencies\n` +
     `npm install --unsafe-perm\n` +
     `echo ${logLabel} Performing Meteor build\n` +
@@ -109,6 +111,7 @@ try {
     await chmod(path.join(projectTemp, 'meteorbuild.sh'), 0o775);
     await new Promise((resolve, reject) => {
         const _command = `docker run -v ${projectTemp}:/dockerhost --rm --name ${containerName} ${fromImage} /dockerhost/meteorbuild.sh`;
+        console.log(`running meteor build with command: ${_command}`);
         exec(_command, {cwd: projectTemp}, error => {
             if(error) reject(error);
             resolve();

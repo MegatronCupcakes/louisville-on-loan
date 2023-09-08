@@ -8,6 +8,7 @@ import {isBad} from '/imports/api/utilities';
 // download adapters
 import {DownloadWithYtdl} from '/imports/api/adapters/ytdl.js';
 import {DownloadWithCurl} from '/imports/api/adapters/curl.js';
+import {DownloadWithMiniget} from '/imports/api/adapters/miniget.js';
 import {retryWait} from '/imports/api/adapters/shared/retryLib';
 
 // Meteor is based on Node 14 so polyfill for AbortController is needed
@@ -75,7 +76,8 @@ const downloadVideo = (job) => {
                                 let adapter;
                                 switch(job.source){
                                     case 'facebook':
-                                        adapter = DownloadWithCurl;
+                                        //adapter = DownloadWithCurl;
+                                        adapter = DownloadWithMiniget;
                                         break;
                                     default:
                                         adapter = DownloadWithYtdl;
@@ -183,6 +185,7 @@ const _mimeTypeFilter = (_jobFormats, _mimeType) => {
 
 const _getJobFormats = (job, audioMimeType, videoMimeType) => {
     return new Promise((resolve, reject) => {
+        if(job.source != 'youtube') resolve();
         const {formats} = ytdl.getInfo(job.url)
         .then(({formats}) => {
             if(isBad(formats)) reject(new Error(`no formats found for stream. (${job._id})`));

@@ -21,12 +21,16 @@ const poll = async () => {
                         resolve();
                     });
                 } else if(video.source == 'facebook'){
-                    if(!JobCollection.findOne({fbFileName: video.fbFileName})){
+                    const findBy = video.facebookVideoId ? {facebookVideoId: video.facebookVideoId} : {fbFileName: video.fbFileName};
+                    if(!JobCollection.findOne(findBy)){
                         await createNewJob({
                             url: video.url,
+                            audioStream: video.audioStream || null,
+                            videoStream: video.videoStream || null,
                             scheduledDate: new Date(),
                             title: video.title,
-                            fbFileName: video.fbFileName,
+                            fbFileName: video.fbFileName || null,
+                            facebookVideoId: video.facebookVideoId || null,
                             source: video.source,
                             thumbnail: video.thumbnail
                         }).catch(error => reject(error));
@@ -50,7 +54,7 @@ const poll = async () => {
             });
         }));   
     } catch(error){
-        logError('Find Video', error);
+        logError('Find Video', error.message);
     }    
 }
 

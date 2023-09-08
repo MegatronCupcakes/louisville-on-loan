@@ -13,12 +13,3 @@ export const isValidVideoFile = (filePath) => {
         ffmpegProcess.on('error', error => reject(error));
     });
 };
-
-export const downloadComplete = async (path, resolve, reject) => {
-    if(await isValidVideoFile(path)){
-        resolve();
-    } else {
-        const error = new Error("invalid video file");
-        reject({...error, retry: true});
-    }
-};
