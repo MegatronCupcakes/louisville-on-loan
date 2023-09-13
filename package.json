@@ -1,5 +1,5 @@
 {
-  "name": "louisville-on-loan",
+  "name": "lol",
   "version": "0.0.9",
   "author": "Dallas Howard <dallas@galacticwidgets.com>",
   "description": "Keep Up with Racing Louisville players on loan",
@@ -20,6 +20,7 @@
     "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
+    "escape-filename": "^1.1.2",
     "ffmpeg-static": "^4.4.1",
     "glob": "^10.3.3",
     "luxon": "^3.2.1",

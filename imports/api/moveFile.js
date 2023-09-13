@@ -10,11 +10,12 @@ import ChannelCollection from '/imports/api/channelCollection';
 import JobCollection from '/imports/api/jobCollection';
 import {isBad} from '/imports/api/utilities';
 import {defaultPaths} from '/imports/api/defaultPaths';
+import escapeFile from 'escape-filename';
 
 const moveFile = (job) => {
     return new Promise(async (resolve, reject) => {        
         const filePath = `${defaultPaths.downloadDir}/${job._id}.mp4`;
-        const destinationPath = `${_getVideoDestination(job)}/${job.title}.mp4`;        
+        const destinationPath = `${_getVideoDestination(job)}/${escapeFile.escape(job.title)}.mp4`;        
         await copyFile(filePath, destinationPath)
         .catch((error) => {
             reject(error);

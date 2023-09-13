@@ -135,7 +135,9 @@ if(platform == 'darwin'){
  * Windows Post-processing
  * ------------------------------
  */
+
 if(platform == 'win32'){
+    
     console.log('windows build; starting special handling.');
     const _tempPath = path.join(path.parse(tempDir).root, '_temp');
     
@@ -147,7 +149,10 @@ if(platform == 'win32'){
         await deleteIfExists(_tempPath);
         await mkdir(_tempPath, {recursive: true});
         await copyRecursive(path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`), _tempPath);
+        await mkdir(path.join(_tempPath, 'bin'));
+                
         // create windows installer
+        console.log(`creating electron installer....`);
         await electronInstaller.createWindowsInstaller({
             version: projectVersion,
             description: 'follow Racing Louisville players on loan',
@@ -156,12 +161,16 @@ if(platform == 'win32'){
             authors: 'MegatronCupcakes',
             exe: `${projectName}.exe`,
             setupExe: `${projectName}-setup.exe`,
-            noMsi: true
+            setupIcon: path.join(projectDir, 'public', 'icons', 'Racing_Louisville_FC_logo.svg-1024x1024.ico'),
+            noMsi: true,
+            loadingGif: path.join(projectDir, 'public', 'lol-players-animated.gif')
         });
         await deleteIfExists(_tempPath);
+        
     } catch(error){
         _terminalError(error);
-    }    
+    }
+    
 }
 
 /**
@@ -171,4 +180,5 @@ if(platform == 'win32'){
  */
 console.log('cleaning up....');
 await deleteIfExists(tempDir).catch(error => _terminalError(error));
+
 console.log('build complete!');
