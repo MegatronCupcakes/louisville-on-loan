@@ -62,18 +62,23 @@ try {
 
 /**
  * ------------------------------
- * Install Puppeteer (may remove in future)
+ * Install Puppeteer (may remove in future if we can leverage electron's chromium instance)
  * ------------------------------
  */
 console.log('Installing Puppeteer....');
-await new Promise((resolve, reject) => {
-    const _command = `"${nodePath}" "${path.join(projectDir, 'util', 'electrify_puppeteer.js')}" "${path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}"`)}`;
-    exec(_command, {cwd: projectTemp}, error => {
-        if(error) reject(error);
-        resolve();
-    });
-})
-.catch(error => _terminalError(error));
+try{
+    await new Promise((resolve, reject) => {
+        const _electrifyPuppeteerPath = path.join(projectDir, 'util', 'electrify_puppeteer.js');
+        const _destinationPath = path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`, 'resources', 'app', 'app', 'programs', 'web.browser', 'app');
+        const _command = `"${nodePath}" "${_electrifyPuppeteerPath}" "${_destinationPath}"`;
+        exec(_command, {cwd: projectTemp}, error => {
+            if(error) reject(error);
+            resolve();
+        });
+    });    
+} catch(error){
+    _terminalError(error)
+}
 
 /**
  * ------------------------------
@@ -83,9 +88,9 @@ await new Promise((resolve, reject) => {
 if(platform == 'linux'){    
     console.log('linux build; starting special handling.');
     try{
-        const _appRunPath = path.join(tempDir, `${projectName}.AppDir`, 'AppRun');
-        const _appImageToolPath = path.join(tempDir, `appimagetool-${sysarch == 'x64' ? 'x86_64' : sysarch}.AppImage`);
         const _appDirPath = path.join(tempDir, `${projectName}.AppDir`);
+        const _appRunPath = path.join(_appDirPath, 'AppRun');
+        const _appImageToolPath = path.join(tempDir, `appimagetool-${sysarch == 'x64' ? 'x86_64' : sysarch}.AppImage`);       
         const _distPath = path.join(projectDir, 'dist', platform, `${projectName}.AppImage`);
         await mkdir(path.join(_appDirPath, 'usr', 'bin', 'resources', 'app', 'db'), {recursive: true});
         await mkdir(path.join(_appDirPath, 'usr', 'lib'), {recursive: true});        
@@ -93,7 +98,15 @@ if(platform == 'linux'){
         await Promise.all(paths.map((_path) => {return copyRecursive(_path, path.join(_appDirPath, 'usr', 'bin'))}));
         const icons = await glob(`${projectDir}${path.sep}public${path.sep}icons${path.sep}*.png`);
         await Promise.all(icons.map((iconPath) => {return copyFile(iconPath, path.join(_appDirPath, `${projectName}.png`))}));
-        const desktopFile = `[Desktop Entry]\nType=Application\nName=${projectName}\nIcon=${projectName}\nExec=${projectName} %u\nCategories=AudioVideo;\nComment=${projectDescription}`;
+        const desktopFile = [
+            `[Desktop Entry]`,
+            `Type=Application`,
+            `Name=${projectName}`,
+            `Icon=${projectName}`,
+            `Exec=${projectName} %u`,
+            `Categories=AudioVideo;`,
+            `Comment=${projectDescription}`
+        ].join('\n');
         await writeFile(path.join(_appDirPath, `${projectName}.desktop`), desktopFile);
         console.log("downloading AppRun....");
         await fetchRemote(`https://github.com/AppImage/AppImageKit/releases/download/13/AppRun-${sysarch == 'x64' ? 'x86_64' : sysarch}`, _appRunPath);
@@ -135,9 +148,7 @@ if(platform == 'darwin'){
  * Windows Post-processing
  * ------------------------------
  */
-
 if(platform == 'win32'){
-    
     console.log('windows build; starting special handling.');
     const _tempPath = path.join(path.parse(tempDir).root, '_temp');
     
@@ -149,10 +160,7 @@ if(platform == 'win32'){
         await deleteIfExists(_tempPath);
         await mkdir(_tempPath, {recursive: true});
         await copyRecursive(path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`), _tempPath);
-        await mkdir(path.join(_tempPath, 'bin'));
-                
         // create windows installer
-        console.log(`creating electron installer....`);
         await electronInstaller.createWindowsInstaller({
             version: projectVersion,
             description: 'follow Racing Louisville players on loan',
@@ -161,16 +169,12 @@ if(platform == 'win32'){
             authors: 'MegatronCupcakes',
             exe: `${projectName}.exe`,
             setupExe: `${projectName}-setup.exe`,
-            setupIcon: path.join(projectDir, 'public', 'icons', 'Racing_Louisville_FC_logo.svg-1024x1024.ico'),
-            noMsi: true,
-            loadingGif: path.join(projectDir, 'public', 'lol-players-animated.gif')
+            noMsi: true
         });
         await deleteIfExists(_tempPath);
-        
     } catch(error){
         _terminalError(error);
-    }
-    
+    }    
 }
 
 /**
@@ -179,6 +183,5 @@ if(platform == 'win32'){
  * ------------------------------
  */
 console.log('cleaning up....');
-await deleteIfExists(tempDir).catch(error => _terminalError(error));
-
+//await deleteIfExists(tempDir).catch(error => _terminalError(error));
 console.log('build complete!');
