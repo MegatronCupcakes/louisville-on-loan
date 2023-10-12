@@ -69,7 +69,10 @@ console.log('Installing Puppeteer....');
 try{
     await new Promise((resolve, reject) => {
         const _electrifyPuppeteerPath = path.join(projectDir, 'util', 'electrify_puppeteer.js');
-        const _destinationPath = path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`, 'resources', 'app', 'app', 'programs', 'web.browser', 'app');
+        const _destinationPath = platform == 'darwin' ? 
+            path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`, `${projectName}.app`, 'Contents', 'Resources', 'app', 'app', 'programs', 'web.browser', 'app')
+            :
+            path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`, 'resources', 'app', 'app', 'programs', 'web.browser', 'app');
         const _command = `"${nodePath}" "${_electrifyPuppeteerPath}" "${_destinationPath}"`;
         exec(_command, {cwd: projectTemp}, error => {
             if(error) reject(error);
