@@ -62,26 +62,6 @@ try {
 
 /**
  * ------------------------------
- * Install Puppeteer (may remove in future if we can leverage electron's chromium instance)
- * ------------------------------
- */
-console.log('Installing Puppeteer....');
-try{
-    await new Promise((resolve, reject) => {
-        const _electrifyPuppeteerPath = path.join(projectDir, 'util', 'electrify_puppeteer.js');
-        const _destinationPath = path.join(tempDir, 'package', `${projectName}-${platform}-${sysarch}`, 'resources', 'app', 'app', 'programs', 'web.browser', 'app');
-        const _command = `"${nodePath}" "${_electrifyPuppeteerPath}" "${_destinationPath}"`;
-        exec(_command, {cwd: projectTemp}, error => {
-            if(error) reject(error);
-            resolve();
-        });
-    });    
-} catch(error){
-    _terminalError(error)
-}
-
-/**
- * ------------------------------
  * Linux Post-processing
  * ------------------------------
  */

@@ -10,12 +10,6 @@ let browserOptions = {
     protocolTimeout: 60 * 1000
 };
 
-if (Meteor.settings.public.electrified && process.cwd().includes('.mount')) {
-    // update the puppeteer executable path for Electron; binaries are copied to puppeteerBin on build
-    const puppeteerBinPath = path.resolve(process.cwd(), '..', 'web.browser', 'app', 'puppeteerBin', 'chrome');
-    browserOptions.executablePath = puppeteerBinPath;
-}
-
 const browser = await puppeteer.launch(browserOptions).catch(error => { throw error });
 const killPuppeteer = (_browser) => {
     _browser.close();
