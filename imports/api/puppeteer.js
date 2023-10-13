@@ -1,9 +1,8 @@
-import { Meteor } from 'meteor/meteor';
+import os from 'node:os';
 import puppeteer from 'puppeteer';
-import path from 'node:path';
 
 let browserOptions = {
-    headless: 'new',
+    headless: os.platform() == 'darwin' ? true : 'new',
     args: [
         '--no-sandbox'
     ],
