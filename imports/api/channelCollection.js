@@ -102,7 +102,14 @@ export const createNewChannel = (channel) => {
             const channelId = await getChannelId(channel.channelName).catch(error => logError('Fetch Channel ID', error.message));
             const type = channelId ? 'id' : 'name'
             const value = channelId ? channelId : channel.channelName;
-            const channelIcon = await MeteorCall('getChannelIcon', type, value).catch(error => logError('Fetch Channel Icon', error.message ? error.message : error));
+            let channelIcon;
+            switch(channel.source){
+                case 'facebook':
+                    channelIcon= await MeteorCall('getFacebookIcon', channel.facebookName).catch(error => logError('Fetch Facebook Icon', error.message ? error.message : error));                    
+                    break;
+                default:
+                    channelIcon= await MeteorCall('getChannelIcon', type, value).catch(error => logError('Fetch Channel Icon', error.message ? error.message : error));
+            }            
             ChannelCollection.insert({
                 ...channel,
                 channelIcon: channelIcon,

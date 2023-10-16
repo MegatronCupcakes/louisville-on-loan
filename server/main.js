@@ -4,7 +4,7 @@ import '/imports/api/errorCollection';
 import '/imports/api/getVideoInfo';
 import '/imports/api/pollForJobs';
 import '/imports/api/runJobs';
-import '/imports/api/getChannelIcon';
+import '/imports/api/getFacebookIcon';
 import '/imports/api/isDocker';
 import '/imports/api/browseFileSystem';
 import '/imports/api/serverUtilities';
