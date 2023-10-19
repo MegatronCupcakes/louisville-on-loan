@@ -1,5 +1,3 @@
-
-import _ from 'underscore';
 import {Meteor} from 'meteor/meteor';
 import {check} from 'meteor/check';
 import browser from '/imports/api/puppeteer';
@@ -10,7 +8,6 @@ const _getFacebookIcon = (facebookName) => {
         let context, page;
         try {
             const url = `https://www.facebook.com/${facebookName}`;
-            console.log(`looking for facebook icons at "${url}"`);
             const iconSelector = 'svg g image';
             context = await browser.createIncognitoBrowserContext();
             page = await context.newPage();
@@ -41,7 +38,6 @@ const _getFacebookIcon = (facebookName) => {
                 await context.close();            
                 context = null;
             }
-            console.log(`error: ${error.message}`);
             reject(error);
         }        
     });
