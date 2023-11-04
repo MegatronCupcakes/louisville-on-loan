@@ -11,10 +11,12 @@ const ChannelContainer = (props) => {
                 modalId={`modal_${props._id}`}
                 _id={props._id}
                 channelName={props.channelName}
+                facebookName={props.facebookName}
                 channelIcon={props.channelIcon}
                 mustHaves={props.mustHaves}
                 inclusions={props.inclusions}
                 exclusions={props.exclusions}
+                source={props.source}
                 destination={props.destination}                      
                 active={props.active}
                 deleted={props.deleted}
@@ -30,6 +32,7 @@ const ChannelContainer = (props) => {
             <Channel 
                 _id={props._id}
                 channelName={props.channelName}
+                facebookName={props.facebookName}
                 channelIcon={props.channelIcon}
                 mustHaves={props.mustHaves}
                 inclusions={props.inclusions}
@@ -47,10 +50,12 @@ const ChannelContainer = (props) => {
 ChannelContainer.propTypes = {
     _id: PropTypes.string,
     channelName: PropTypes.string,
+    facebookName: PropTypes.string,
     channelIcon: PropTypes.string,
     mustHaves: PropTypes.array,
     inclusions: PropTypes.array,
     exclusions: PropTypes.array,
+    source: PropTypes.string,
     destination: PropTypes.string,
     active: PropTypes.bool,
     deleted: PropTypes.bool,

@@ -94,6 +94,8 @@ const MainContainer = (props) => {
                                     key={`channel_${index}`}
                                     _id={channel._id}
                                     channelName={channel.channelName}
+                                    facebookName={channel.facebookName}
+                                    source={channel.source}
                                     channelIcon={channel.channelIcon}
                                     mustHaves={channel.mustHaves}
                                     inclusions={channel.inclusions}

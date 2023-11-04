@@ -4,7 +4,31 @@ import ProgressSpinner from '/imports/ui/indicators/progressSpinner';
 import FileBrowserContainer from '/imports/ui/fileBrowser/fileBrowserContainer';
 
 const ChannelModal = (props) => {
-    const _addOrEdit = props._id ? 'Edit' : 'Add';  
+    const _addOrEdit = props._id ? 'Edit' : 'Add';
+    const _nameEntry = () => {
+        switch(props.source){
+            case 'facebook':
+                return (
+                    <>
+                        <label htmlFor="facebookName" className="form-label">Facebook URL</label>
+                        <div className="input-group">
+                            <span className="input-group-text">https://www.facebook.com/</span>
+                            <input type="text" className="form-control" id="facebookName" aria-describedby="facebookNameHelp" placeholder={props.facebookName} onChange={props.onFacebookNameChange}/>
+                        </div>
+                    </>
+                );
+            default:
+                return (
+                    <>
+                        <label htmlFor="channelName" className="form-label">YouTube Channel Name</label>
+                        <div className="input-group">
+                            <span className="input-group-text">@</span>
+                            <input type="text" className="form-control" id="channelName" aria-describedby="channelNameHelp" placeholder={props.channelName} onChange={props.onNameChange}/>
+                        </div>
+                    </>
+                )
+        }
+    }
     const _isNewTermType = (type) => {
         return type == props.newTermType;
     };
@@ -15,6 +39,9 @@ const ChannelModal = (props) => {
                 <div key={term} data-term={term} data-type={type} className="btn btn-primary channelTerm" onClick={props.onRemoveClick}><i className="bi bi-x-square removeTermBtn"></i>{term}</div>
             )
         });
+    }
+    const _isSource = (inputSource) => {
+        return props.source == inputSource;
     }
     const _reset = () => {
         const _formElement = document.getElementById(`form_${props.modalId}`);
@@ -32,11 +59,21 @@ const ChannelModal = (props) => {
                     <div className="modal-body">
                         <form id={`form_${props.modalId}`}>
                             <div className="mb-3">
-                                <label htmlFor="channelName" className="form-label">YouTube Channel Name</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">@</span>
-                                    <input type="text" className="form-control" id="channelName" aria-describedby="channelNameHelp" placeholder={props.channelName} onChange={props.onNameChange}/>
-                                </div>                                
+                                <label htmlFor="newTerm" className="form-label">Video Source</label>
+                                <div id="newTermHelp" className="form-text">
+                                    <div className="form-check form-check-inline">
+                                        <input className="form-check-input" type="radio" name="source" id="youtube" value="youtube" onChange={props.onSourceChange} checked={_isSource("youtube")}></input>
+                                        <label className="form-check-label" htmlFor="youtube"><i className="bi bi-youtube"></i> youtube</label>
+                                    </div>
+                                    <div className="form-check form-check-inline">
+                                        <input className="form-check-input" type="radio" name="source" id="facebook" value="facebook" onChange={props.onSourceChange} checked={_isSource("facebook")}></input>
+                                        <label className="form-check-label" htmlFor="facebook"><i className="bi bi-facebook"></i> facebook</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div className="mb-3">
+                                {_nameEntry()}                                
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="destination" className="form-label">Destination</label>
@@ -126,6 +163,8 @@ ChannelModal.propTypes = {
     _id: PropTypes.string,
     channelName: PropTypes.string,
     onNameChange: PropTypes.func.isRequired,
+    facebookName: PropTypes.string,
+    onFacebookNameChange: PropTypes.func,
     channelIcon: PropTypes.string,
     mustHaves: PropTypes.array,
     inclusions: PropTypes.array,
@@ -147,6 +186,7 @@ ChannelModal.propTypes = {
     newTermType: PropTypes.string.isRequired,
     onTermChange: PropTypes.func.isRequired,
     onTypeChange: PropTypes.func.isRequired,
+    onSourceChange: PropTypes.func.isRequired,
     onRemoveClick: PropTypes.func.isRequired,
     onCancelClick: PropTypes.func.isRequired,
     onSaveClick: PropTypes.func.isRequired,

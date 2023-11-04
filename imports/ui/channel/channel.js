@@ -2,7 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Channel = (props) => {
-    const dockerImage = props.isDocker ? (<img className="dockerLogo" src="https://www.docker.com/wp-content/uploads/2022/03/horizontal-logo-monochromatic-white.png"/>) : (<></>);
+    const _dockerImage = props.isDocker ? (<img className="dockerLogo" src="https://www.docker.com/wp-content/uploads/2022/03/horizontal-logo-monochromatic-white.png"/>) : (<></>);
+    const _displayName = () => {
+        switch(props.source){
+            case 'facebook':
+                return `https://www.facebook.com/${props.facebookName}`;
+            default:
+                return `@${props.channelName}`;
+        }
+    };
     return (
         <div className="card text-bg-secondary mb-3">
             <div className="row g-0">
@@ -11,7 +19,7 @@ const Channel = (props) => {
                 </div>
                 <div className="col-md-11">
                     <div className="card-body">
-                        <h5 className="card-title">@{props.channelName}{dockerImage}</h5> 
+                        <h5 className="card-title">{_displayName()}{_dockerImage}</h5> 
                         <p className="card-text">destination: {props.destination}</p>
                         <p className="card-text">{props.active ? (<span className="text-success"><strong>active</strong></span>) : (<span className="text-danger"><strong>inactive</strong></span>)}</p>
                         <table className="table table-secondary">
@@ -52,7 +60,9 @@ const Channel = (props) => {
 }
 Channel.propTypes = {
     _id: PropTypes.string,
+    source: PropTypes.string,
     channelName: PropTypes.string,
+    facebookName: PropTypes.string,
     channelIcon: PropTypes.string,
     mustHaves: PropTypes.array,
     inclusions: PropTypes.array,

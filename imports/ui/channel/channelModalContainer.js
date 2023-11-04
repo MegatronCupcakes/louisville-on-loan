@@ -8,7 +8,9 @@ import ChannelModal from '/imports/ui/channel/channelModal';
 
 const ChannelModalContainer = (props) => {    
     const _defaults = {
+        source: _.isUndefined(props.source) ? 'youtube' : props.source,
         channelName: _.isUndefined(props.channelName) ? '' : props.channelName,
+        facebookName: _.isUndefined(props.facebookName) ? '' : props.facebookName,
         channelIcon: _.isUndefined(props.channelIcon) ? '' : props.channelIcon,
         mustHaves: props._id ? props.mustHaves : [],
         inclusions: props._id ? props.inclusions : [],
@@ -20,9 +22,11 @@ const ChannelModalContainer = (props) => {
         newTermType: 'mustHaves',
         showFileBrowser: false,
         disableFormButtons: false,
-        resetNow: false
+        resetNow: false    
     }
+    const [source, setSource] = useState(_defaults.source);
     const [channelName, setChannelName] = useState(_defaults.channelName);
+    const [facebookName, setFacebookName] = useState(_defaults.facebookName);
     const [channelIcon, setChannelIcon] = useState(_defaults.channelIcon);
     const [mustHaves, setMustHaves] = useState(_defaults.mustHaves);
     const [inclusions, setInclusions] = useState(_defaults.inclusions);
@@ -80,9 +84,15 @@ const ChannelModalContainer = (props) => {
             }
         }
     ];
+    const onSourceChange = ({currentTarget}) => {
+        setSource(currentTarget.value);
+    };
     const onNameChange = ({currentTarget}) => {
         setChannelName(currentTarget.value);
-    }    
+    };
+    const onFacebookNameChange = ({currentTarget}) => {
+        setFacebookName(currentTarget.value);
+    };
     const onDestinationSelection = (path) => {
         setDestination(path);
         setShowFileBrowser(false);
@@ -117,45 +127,42 @@ const ChannelModalContainer = (props) => {
         _resetForm();
     };
     const onSaveClick = async () => {
-        // do validation, save, then close modal and reset form.
-        let error = null;        
-        clearValidationFeedback(_validations);
-        if(await validationFeedback(_validations)){
-            setDisableFormButtons(true);
-            if(props._id){
-                await MeteorCall('updateChannel', {
+        try {
+            // do validation, save, then close modal and reset form.     
+            clearValidationFeedback(_validations);
+            if(await validationFeedback(_validations)){
+                setDisableFormButtons(true);
+                let _verb = 'createChannel';
+                let _channel = {
                     _id: props._id,
-                    channelName: channelName,
-                    destination: await _determineDestination(),
-                    mustHaves: mustHaves,
-                    inclusions: inclusions,
-                    exclusions: exclusions,
-                    active: active,
-                    deleted: deleted
-                }).catch(_error => error = _error);
-            } else {
-                await MeteorCall('createChannel', {
-                    channelName: channelName,
-                    destination: await _determineDestination(),
-                    mustHaves: mustHaves,
-                    inclusions: inclusions,
-                    exclusions: exclusions,
-                    active: active,
-                    deleted: deleted
-                }).catch(_error => error = _error);
-            }
-            if(error){
-                setDisableFormButtons(false);
-                console.log("ERROR:", error);
-            } else {
+                        source: source,
+                        channelName: channelName,
+                        facebookName: facebookName,
+                        destination: await _determineDestination(),
+                        mustHaves: mustHaves,
+                        inclusions: inclusions,
+                        exclusions: exclusions,
+                        active: active,
+                        deleted: deleted
+                };
+                if(props._id){
+                    _channel._id = props._id;
+                    _verb = 'updateChannel';
+                }
+                await MeteorCall(_verb, _channel);
                 _resetForm();
-                closeModal(props.modalId);
-            }
-        }                
+                closeModal(props.modalId);            
+            }       
+        } catch (error){
+            setDisableFormButtons(false);
+            console.log("ERROR:", error);
+        }                        
     };
     const _resetForm = async () => {
         // reset defaults
+        setSource(_defaults.source);
         setChannelName(_defaults.channelName);
+        setFacebookName(_defaults.facebookName);
         setChannelIcon(_defaults.channelIcon);
         setMustHaves(_defaults.mustHaves);
         setInclusions(_defaults.inclusions);
@@ -177,8 +184,12 @@ const ChannelModalContainer = (props) => {
         <ChannelModal
             modalId={props.modalId}
             _id={props._id}
+            source={source}
+            onSourceChange={onSourceChange}
             channelName={channelName}
             onNameChange={onNameChange}
+            facebookName={facebookName}
+            onFacebookNameChange={onFacebookNameChange}
             channelIcon={channelIcon}
             mustHaves={mustHaves}
             inclusions={inclusions}
@@ -219,11 +230,13 @@ ChannelModalContainer.propTypes = {
     modalId: PropTypes.string.isRequired,
     _id: PropTypes.string,
     channelName: PropTypes.string,
+    facebookName: PropTypes.string,
     channelIcon: PropTypes.string,
     mustHaves: PropTypes.array,
     inclusions: PropTypes.array,
     exclusions: PropTypes.array,
     destination: PropTypes.string,
+    source: PropTypes.string,
     active: PropTypes.bool,
     deleted: PropTypes.bool,            
     createdAt: PropTypes.instanceOf(Date),
