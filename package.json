@@ -13,7 +13,7 @@
     "build-docker": "node ./util/docker-build.mjs"
   },
   "dependencies": {
-    "@babel/runtime": "^7.17.9",
+    "@babel/runtime": "^7.23.2",
     "@baggie/string": "^1.5.0",
     "@megatroncupcakes/fb-downloader": "github:MegatronCupcakes/fb-downloader",
     "@megatroncupcakes/get-youtube-id-by-url": "^1.0.0",
@@ -22,7 +22,7 @@
     "bootstrap-icons": "^1.10.3",
     "escape-filename": "^1.1.2",
     "ffmpeg-static": "^4.4.1",
-    "glob": "^10.3.3",
+    "glob": "^10.3.10",
     "luxon": "^3.2.1",
     "meteor-electrify-client": "^2.0.0",
     "meteor-node-stubs": "^1.2.5",
@@ -38,7 +38,7 @@
     "to-camel-case": "^1.0.0",
     "underscore": "^1.13.6",
     "xml-js": "^1.6.11",
-    "ytdl-core": "^4.9.1"
+    "ytdl-core": "^4.11.5"
   },
   "meteor": {
     "mainModule": {
@@ -75,6 +75,6 @@
   },
   "electrifyDependencies": {},
   "devDependencies": {
-    "electron-winstaller": "^5.1.0"
+    "electron-winstaller": "^5.1.2"
   }
 }

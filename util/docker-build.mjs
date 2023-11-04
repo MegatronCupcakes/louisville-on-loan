@@ -30,7 +30,10 @@ const meteorString = meteorBuffer.toString().trim();
 const meteorVersion = meteorString.split('@')[1].trim();
 const puppeteerVersion = packageJson.dependencies.puppeteer.replace('^','');
 const logLabel = `[${projectName}-docker-build]`;
+const baseImage = 'debian:12-slim';
 const fromImage = `megatroncupcakes/node:${meteorNodeVersion}`;
+const nodeUrl = `https://static.meteor.com/dev-bundle-node-os/v${meteorNodeVersion}/node-v${meteorNodeVersion}-linux-x64.tar.gz`;
+const nodeDir = "/usr/local";
 const containerName=`meteor-build-${projectName}`;
 const date = new Date();
 const dateString = `${Number(date.getMonth()) + 1}-${date.getDate()}-${date.getFullYear()}`;
@@ -54,6 +57,35 @@ console.log(`\n\n${logLabel} Beginning Docker build:\n` +
 
 /**
  * ------------------------------
+ * Build Base Docker Image
+ * ------------------------------
+ */
+const baseDockerfile = `# Dockerfile\n` +
+    `FROM ${baseImage}\n` +
+    `ENV NODE_VERSION="${meteorNodeVersion}"\n` +
+    `ENV NODE_URL="${nodeUrl}"\n` +
+    `ENV DIR_NODE="${nodeDir}"\n` +
+    `RUN apt-get update && apt-get install -y wget && apt-get install --fix-missing\n` +
+    `RUN wget -qO- ${nodeUrl} | tar -xz -C ${nodeDir}/ && mv ${nodeDir}/node-v${meteorNodeVersion}-linux-x64 ${nodeDir}/v${meteorNodeVersion}\n` +
+    `ENV NODE_PATH="${nodeDir}/v${meteorNodeVersion}/lib/node_modules"\n` +
+    `ENV PATH="${nodeDir}/v${meteorNodeVersion}/bin:$PATH"\n` +
+    `RUN node -v\n` +
+    `RUN npm -v\n`;
+try{
+    await writeFile(path.join(tempDir, 'Dockerfile'), baseDockerfile);
+    await new Promise((resolve, reject) => {
+        const _command = `docker build -t ${fromImage} ${tempDir}`;
+        exec(_command, {cwd: tempDir}, error => {
+            if(error) reject(error);
+            resolve();
+        });
+    });
+} catch(error){
+    _terminalError(error);
+}
+    
+/**
+ * ------------------------------
  * Write Dockerfile
  * ------------------------------
  */
@@ -69,14 +101,14 @@ const dockerfile = `# Dockerfile\n` +
     `    sed -i 's/^# *\\\(en_US.UTF-8\\)/\\\\1/' /etc/locale.gen &&  \\\n` +
     `    locale-gen\n` +
     `RUN apt-get update && \\\n` +
-    `    apt-get install -y curl python2 ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 \\\n` +
+    `    apt-get install -y curl dh-python ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 \\\n` +
     `    libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libasound2 libcurl4-openssl-dev && \\\n` +
     `    apt-get install --fix-missing && \\\n` +
     `    npm install -g puppeteer@${puppeteerVersion} --unsafe-perm\n` +
     `WORKDIR /home/node/app\n` +
     `EXPOSE 3000\n` +
     `CMD ./docker-run.sh`;
-await writeFile(path.join(projectTemp, 'Dockerfile'), dockerfile).catch(error => _terminalError(error));
+await writeFile(path.join(projectTemp, '..', 'Dockerfile'), dockerfile).catch(error => _terminalError(error));
 
 /**
  * ------------------------------
@@ -88,10 +120,10 @@ const meteorBuildScript = `#!/bin/sh\n` +
     `export NPM_CONFIG_PREFIX=/home/node/.npm-global\n` +
     'export PATH=/root/.meteor:/home/node/.npm-global/bin:${PATH}\n' +
     `echo ${logLabel} Meteor container started, installing tools\n` +
-    `apt-get update && apt-get install -y git jq xargs\n` +
+    `apt-get update && apt-get install -y git jq findutils\n` +
     `npm install -g meteor@${meteorVersion} --unsafe-perm\n` +
     `echo ${logLabel} Creating Meteor build project\n` +
-    `cd /dockerhost/\n` +
+    `cd /dockerhost\n` +
     `meteor create ${projectName} --minimal --allow-superuser\n` +
     `cp -R ./source/. ./${projectName}/\n` +
     `cd ./${projectName}\n` +
@@ -106,11 +138,11 @@ const meteorBuildScript = `#!/bin/sh\n` +
     `npm install --omit=dev --unsafe-perm\n` +
     `echo ${logLabel} Meteor build complete.`;
 try {
-    await copyFile(path.join(projectDir, 'docker-run.sh'), path.join(projectTemp, 'docker-run.sh'));
-    await writeFile(path.join(projectTemp, 'meteorbuild.sh'), meteorBuildScript);
-    await chmod(path.join(projectTemp, 'meteorbuild.sh'), 0o775);
+    await copyFile(path.join(projectDir, 'docker-run.sh'), path.join(projectTemp, '..', 'docker-run.sh'));
+    await writeFile(path.join(projectTemp, '..', 'meteorbuild.sh'), meteorBuildScript);
+    await chmod(path.join(projectTemp, '..', 'meteorbuild.sh'), 0o775);
     await new Promise((resolve, reject) => {
-        const _command = `docker run -v ${projectTemp}:/dockerhost --rm --name ${containerName} ${fromImage} /dockerhost/meteorbuild.sh`;
+        const _command = `docker run -v ${path.join(projectTemp, '..')}:/dockerhost --rm --name ${containerName} ${fromImage} /dockerhost/meteorbuild.sh`;
         console.log(`running meteor build with command: ${_command}`);
         exec(_command, {cwd: projectTemp}, error => {
             if(error) reject(error);
@@ -129,7 +161,7 @@ try {
 try {    
     console.log(`${logLabel} Starting Docker build.....`);
     await new Promise((resolve, reject) => {
-        const _command = `docker build -t ${dateTag} ${projectTemp}`;
+        const _command = `docker build -t ${dateTag} ${path.join(projectTemp, '..')}`;
         exec(_command, {cwd: tempDir}, error => {
             if(error) reject(error);
             resolve();
