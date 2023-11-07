@@ -2,6 +2,7 @@ import '/imports/api/jobCollection';
 import '/imports/api/channelCollection';
 import '/imports/api/errorCollection';
 import '/imports/api/getVideoInfo';
+import '/imports/api/cacheImage';
 import '/imports/api/pollForJobs';
 import '/imports/api/runJobs';
 import '/imports/api/getFacebookIcon';

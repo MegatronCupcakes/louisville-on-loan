@@ -38,7 +38,11 @@ const findChannelVideos = () => {
                                 _resolve(channelData);
                                 break;
                             case 'youtube':
-                                channelData = await findWithRSS(monitorData);
+                                // having issues finding live youtube videos in a timely manner, so will try both approaches.
+                                channelData = [
+                                    ...await findWithPuppeteer(monitorData),
+                                    ...await findWithRSS(monitorData)                                    
+                                ];
                                 videoData = await _getAdditionalYoutubeData(channelData, monitorData);
                                 _resolve(videoData);
                                 break;

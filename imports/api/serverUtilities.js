@@ -1,5 +1,5 @@
 import {Meteor} from 'meteor/meteor';
-import {check, Match} from 'meteor/check';
+import {check} from 'meteor/check';
 import {fetch} from 'meteor/fetch';
 import {channelId as findChannelId, channelIconByName, channelIconById} from '@megatroncupcakes/get-youtube-id-by-url';
 import {getChannelUrl} from '/imports/api/utilities';

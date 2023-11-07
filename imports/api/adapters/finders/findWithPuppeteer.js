@@ -28,59 +28,68 @@ const _cookies = {
 };
 
 export const findWithPuppeteer = (monitorData, selector) => {
-    return new Promise(async (resolve, reject) => {        
+    return new Promise(async (resolve, reject) => {       
         let context, page, links;
-        const _handleError = _error => console.log(`puppeteer error: ${_error.message}`);
         const _cleanUp = async () => {            
             if(page){
-                await page.close().catch(_handleError);
+                await page.close();
                 page = null;
             }
             if(context){
-                await context.clearPermissionOverrides().catch(_handleError);
-                await context.close().catch(_handleError);                
+                await context.clearPermissionOverrides();
+                await context.close();                
                 context = null;
             }
         };
-        const url = _getUrl[monitorData.source](monitorData);
-        const linkSelector = _selectors[monitorData.source];
-
-        context = await browser.createIncognitoBrowserContext().catch(_handleError);
-        page = await context.newPage().catch(_handleError);
-        // set cookies        
-        const cookies = _.keys(_cookies).map(key => {
-            return {
-                name: key,
-                value: _cookies[key],
-                domain: "facebook.com"
-            };
-        });
-        await page.setCookie(...cookies);
-        // seeing a lot of timeout errors because page crashes with a code 11 error.
-        await page.goto(url).catch(_handleError);   
-                    
-        await page.waitForSelector(linkSelector).catch(_handleError);
-        links = await new Promise(async (resolve, reject) => {                
-            const _getLinks = async (_linkCount) => {
-                let _links = await page.evaluate(linkSelector => {
-                    return [...document.querySelectorAll(linkSelector)].map(anchor => {
-                        return {title: anchor.textContent, url: anchor.href};
-                    });
-                }, linkSelector).catch(error => reject(error));
-                // apply additional link filtering
-                _links = _filters[monitorData.source](_links);
-                if(_linkCount > 0 && _linkCount == _links.length){
-                    resolve(_links);
-                } else {
-                    _.delay(() => {
-                        _getLinks(_links ? _links.length : 0);
-                    }, _pageWait);
-                }                    
-            }                
-            _getLinks(0);
-        }).catch(_handleError);
+        try {            
+            const url = _getUrl[monitorData.source](monitorData);
+            const linkSelector = selector ? selector : _selectors[monitorData.source];    
+            context = await browser.createIncognitoBrowserContext();
+            page = await context.newPage();
+            if(monitorData.source == 'facebook'){
+                // set facebook cookies        
+                const cookies = _.keys(_cookies).map(key => {
+                    return {
+                        name: key,
+                        value: _cookies[key],
+                        domain: "facebook.com"
+                    };
+                });
+                await page.setCookie(...cookies);
+            }            
+            // seeing a lot of timeout errors because page crashes with a code 11 error.
+            //
+            // https://stackoverflow.com/questions/76054650/puppeteer-tab-crashes-only-on-youtube-com-aw-snap-status-access-violation
+            // reducing puppeteer from 19.11.1 to 18.2.1 as it reportedly doesn't suffer from this issue.
+            // 20.x also reportedly works but requires a newer node version.            
+            await page.goto(url);                       
+            await page.waitForSelector(linkSelector);
+            links = await new Promise(async (resolve, reject) => {                
+                const _getLinks = async (_linkCount) => {
+                    let _links = await page.evaluate(linkSelector => {
+                        return [...document.querySelectorAll(linkSelector)].map(anchor => {
+                            return {title: anchor.textContent, url: anchor.href};
+                        });
+                    }, linkSelector).catch(error => reject(error));
+                    // apply additional link filtering
+                    _links = _filters[monitorData.source](_links);
+                    if(_linkCount > 0 && _linkCount == _links.length){
+                        resolve(_links);
+                    } else {
+                        _.delay(() => {
+                            _getLinks(_links ? _links.length : 0);
+                        }, _pageWait);
+                    }                    
+                }                
+                _getLinks(0);
+            });
+            _cleanUp();
+            resolve(links ? links : []);
+        } catch (error){
+            console.log(`puppeteer error: ${error.message}`);
+            _cleanUp();
+            reject(error);
+        }                
         
-        _cleanUp();
-        resolve(links ? links : []);       
     });
 }

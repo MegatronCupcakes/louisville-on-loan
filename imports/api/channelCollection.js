@@ -112,7 +112,7 @@ export const createNewChannel = (channel) => {
             }            
             ChannelCollection.insert({
                 ...channel,
-                channelIcon: channelIcon,
+                channelIcon: channelIcon ? await MeteorCall('cacheImage', channelIcon) : null,
                 channelId: channelId,
                 deleted: false,
                 active: true,

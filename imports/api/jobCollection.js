@@ -84,10 +84,11 @@ if(Meteor.isServer){
 }
 
 export const createNewJob = (job) => {
-    return new Promise((resolve, reject) => {
-        if(!Meteor.isServer) reject(new Meteor.Error('action not permitted', 'action only available on server'));
+    return new Promise(async (resolve, reject) => {
+        if(!Meteor.isServer) reject(new Meteor.Error('action not permitted', 'action only available on server'));        
         JobCollection.insert({
             ...job,
+            thumbnail: job.thumbnail ? await MeteorCall('cacheImage', job.thumbnail) : null,
             deleted: false,
             processed: false,
             createdAt: new Date()
