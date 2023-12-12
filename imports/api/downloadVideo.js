@@ -56,7 +56,7 @@ const downloadVideo = (job) => {
                         let jobFormats = null;
                         let privateVideo = false;
                         _getJobFormats(job)
-                        .then((_jobFormats) => {
+                        .then((_jobFormats) => {                            
                             jobFormats = _jobFormats;
                         })
                         .catch((_error) => {
@@ -72,6 +72,11 @@ const downloadVideo = (job) => {
                             if(privateVideo){
                                 _reject(new Error(`(${job._id}) private video`));
                             } else {
+                                // if jobFormats, grab audio and video stream and attach to job for miniget adapter
+                                if(jobFormats){
+                                    job.audioStream = jobFormats.audio.filter(format => format.container == 'mp4').sort((a,b) => b.bitrate - a.bitrate)[0].url;
+                                    job.videoStream = jobFormats.video.filter(format => format.container == 'mp4').sort((a,b) => b.height - a.height)[0].url;
+                                }
                                 JobCollection.update({_id: job._id}, {$set: {'downloadProgress.formats': jobFormats}});
                                 let adapter;
                                 switch(job.source){
@@ -81,6 +86,7 @@ const downloadVideo = (job) => {
                                         break;
                                     default:
                                         adapter = DownloadWithYtdl;
+                                        //adapter = DownloadWithMiniget;
 
                                 }
                                 adapter(job, jobFormats, defaultPaths.downloadDir, controller)
