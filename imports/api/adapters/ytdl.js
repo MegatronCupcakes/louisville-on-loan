@@ -8,7 +8,7 @@ import {pathExists, deleteFile} from '/imports/api/browseFileSystem';
 
 const _chooseFormat = (jobFormats, type) => {
     try {
-        return jobFormats[type][0].itag;
+        return jobFormats[type].filter(format => format.container == 'mp4').sort((a,b) => b.bitrate - a.bitrate)[0].itag;
     } catch(error){
         return "highest";
     }
