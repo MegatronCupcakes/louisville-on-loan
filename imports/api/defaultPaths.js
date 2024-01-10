@@ -8,6 +8,7 @@ const camel = require('to-camel-case');
 const _appName = camel(require('/package.json').name);
 
 export const defaultPaths = {
+    binDir: process.env.DOCKER === true || process.env.DOCKER === "true" ? '/dlBin' : process.env.binDir || path.join(os.homedir(), `.${_appName}`, 'bin'),
     downloadDir: process.env.DOCKER === true || process.env.DOCKER === "true" ? '/Downloads' : process.env.downloadDir || path.join(os.homedir(), `.${_appName}`, 'downloads'),
     videoDestination: process.env.DOCKER === true || process.env.DOCKER === "true" ? '/Destination' : process.env.videoDestination || path.join(os.homedir(), 'Videos')
 };

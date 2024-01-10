@@ -65,7 +65,7 @@ const baseDockerfile = `# Dockerfile\n` +
     `ENV NODE_VERSION="${meteorNodeVersion}"\n` +
     `ENV NODE_URL="${nodeUrl}"\n` +
     `ENV DIR_NODE="${nodeDir}"\n` +
-    `RUN apt-get update && apt-get install -y wget && apt-get install --fix-missing\n` +
+    `RUN apt-get update && apt-get install -y wget python3 && apt-get install --fix-missing\n` +
     `RUN wget -qO- ${nodeUrl} | tar -xz -C ${nodeDir}/ && mv ${nodeDir}/node-v${meteorNodeVersion}-linux-x64 ${nodeDir}/v${meteorNodeVersion}\n` +
     `ENV NODE_PATH="${nodeDir}/v${meteorNodeVersion}/lib/node_modules"\n` +
     `ENV PATH="${nodeDir}/v${meteorNodeVersion}/bin:$PATH"\n` +
@@ -131,11 +131,13 @@ const meteorBuildScript = `#!/bin/sh\n` +
     `git config --global url."https://".insteadOf git://\n` +
     `echo ${logLabel} Installing NPM build dependencies\n` +
     `npm install --unsafe-perm\n` +
+    `npm install youtube-dl-exec --unsafe-perm\n` +
     `echo ${logLabel} Performing Meteor build\n` +
     `meteor build --directory /dockerhost --allow-superuser --platforms=web.browser\n` +
     `echo ${logLabel} Installing Bundled NPM packages\n` +
     `cd /dockerhost/bundle/programs/server\n` +
     `npm install --omit=dev --unsafe-perm\n` +
+    `npm install youtube-dl-exec --unsafe-perm\n` +
     `echo ${logLabel} Meteor build complete.`;
 try {
     await copyFile(path.join(projectDir, 'docker-run.sh'), path.join(projectTemp, '..', 'docker-run.sh'));

@@ -1,6 +1,7 @@
 .nvmrc
 .DS_Store
 .dist
+bin/*
 node_modules/
 dist/darwin/
 dist/docker/

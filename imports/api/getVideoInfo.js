@@ -2,15 +2,20 @@ import {Meteor} from 'meteor/meteor';
 import {check} from 'meteor/check';
 import {isBad} from '/imports/api/utilities';
 import ytdl from 'ytdl-core';
+import getFBInfo from "@megatroncupcakes/fb-downloader";
 
 Meteor.methods({
     'getVideoInfo': async function(url){
         check(url, String);
         if(isBad(url)) return;
-        const videoData = await ytdl.getInfo(url).catch(error => {
-            throw new Meteor.Error(_translateErrorMsg(error.message))
-        });
-        return videoData.videoDetails;
+        try {
+            let videoData, error;
+            if(url.includes('youtube')) videoData = (await ytdl.getInfo(url)).videoDetails;
+            if(url.includes('facebook')) videoData = await getFBInfo(url);
+            return videoData;
+        } catch(error){
+            throw new Meteor.Error(_translateErrorMsg(error.message));
+        }        
     }
 });
 

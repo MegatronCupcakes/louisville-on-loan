@@ -7,6 +7,7 @@ import {isBad} from '/imports/api/utilities';
 
 // download adapters
 import {DownloadWithYtdl} from '/imports/api/adapters/ytdl.js';
+import {DownloadWithYoutubeDl} from '/imports/api/adapters/youtube-dl.js';
 import {DownloadWithCurl} from '/imports/api/adapters/curl.js';
 import {DownloadWithMiniget} from '/imports/api/adapters/miniget.js';
 import {retryWait} from '/imports/api/adapters/shared/retryLib';
@@ -85,7 +86,8 @@ const downloadVideo = (job) => {
                                         adapter = DownloadWithMiniget;
                                         break;
                                     default:
-                                        adapter = DownloadWithYtdl;
+                                        adapter = DownloadWithYoutubeDl;
+                                        //adapter = DownloadWithYtdl;                                        
                                         //adapter = DownloadWithMiniget;
 
                                 }
