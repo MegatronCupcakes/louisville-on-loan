@@ -33,6 +33,8 @@
             "inclusions": [
             ],
             "exclusions": [
+                "Sub 19",
+                "Sub19"
             ],
             "source": "facebook"
         }
