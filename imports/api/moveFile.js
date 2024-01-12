@@ -5,7 +5,9 @@ If no destination is defined for the channel, copy to defaultPaths.videoDestinat
 If this is a one-off video download, copy to job.destination.  If job.destination
 does not exist, copy to defaultPaths.videoDestination.
 */
-import {copyFile, unlink} from 'fs/promises';
+import _ from 'underscore';
+import {copyFile, unlink, readdir} from 'node:fs/promises';
+import path from 'node:path';
 import ChannelCollection from '/imports/api/channelCollection';
 import JobCollection from '/imports/api/jobCollection';
 import {isBad} from '/imports/api/utilities';
@@ -13,9 +15,11 @@ import {defaultPaths} from '/imports/api/defaultPaths';
 import escapeFile from 'escape-filename';
 
 const moveFile = (job) => {
-    return new Promise(async (resolve, reject) => {        
-        const filePath = `${defaultPaths.downloadDir}/${job._id}.mp4`;
-        const destinationPath = `${_getVideoDestination(job)}/${escapeFile.escape(job.title)}.mp4`;        
+    return new Promise(async (resolve, reject) => {
+        const files = await readdir(defaultPaths.downloadDir);
+        const downloadedFile = _.find(files, filePath => filePath.includes(job._id));
+        const filePath = path.join(defaultPaths.downloadDir, downloadedFile);
+        const destinationPath = path.join(_getVideoDestination(job), `${escapeFile.escape(job.title)}${path.extname(downloadedFile)}`);        
         await copyFile(filePath, destinationPath)
         .catch((error) => {
             reject(error);
