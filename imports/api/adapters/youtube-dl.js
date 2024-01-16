@@ -52,10 +52,12 @@ export const DownloadWithYoutubeDl = (job, jobFormats, downloadDir, controller) 
             // delay in case of multipart downloads that must be reassembled
             _.delay(async () => {
                 const files = await readdir(downloadDir);                
-                const downloadedFile = _.find(files, filePath => filePath.includes(job._id));
+                let downloadedFile = _.find(files, file => file.includes(job._id));
+                downloadedFile = path.join(downloadDir, downloadedFile);
+                const transcodedFile = path.join(downloadDir, `${job._id}.mp4`);
                 if(!_.contains(acceptableContainers, path.extname(downloadedFile))){
-                    // download is not in an acceptable container; use ffmpeg to transcode
-                    await _transcodeFile(path.join(downloadDir, downloadedFile), path.join(downloadDir, `${job._id}.mp4`));
+                    // download is not in an acceptable container; use ffmpeg to re-mux (transcoding is too expensive)
+                    await _remux(downloadedFile, transcodedFile);
                     await rm(downloadedFile);
                 }
                 resolve();
@@ -66,17 +68,18 @@ export const DownloadWithYoutubeDl = (job, jobFormats, downloadDir, controller) 
     });
 }
 
-const _transcodeFile = (inputFile, outputFile) => {
+const _remux = (inputFile, outputFile) => {
     return new Promise((resolve, reject) => {
         let _error;
-        let _transcode = spawn(ffmpeg, [
+        let _ffmpeg = spawn(ffmpeg, [
             '-i', inputFile,
+            '-c', 'copy',
             outputFile
         ]);
-        _transcode.on('error', (error) => {
+        _ffmpeg.on('error', (error) => {
             _error = error;
         });
-        _transcode.on('close', (response) => {
+        _ffmpeg.on('close', (response) => {
             if(response == 0){
                 resolve();
             } else {
